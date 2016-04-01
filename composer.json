@@ -1,0 +1,36 @@
+{
+    "name": "mkrauss/tic",
+    "description": "Transactional Iterative Changes",
+    "authors": [
+        {
+            "name": "Matthew Krauss",
+            "email": "mkrauss@nabancard.com"
+        }
+    ],
+
+    "autoload": {
+        "psr-4": {
+            "tic\\": "tic/"
+        }
+    },
+
+    "require": {
+        "lstrojny/functional-php": "~1.2",
+        "alexkazik/getopts": "1.0.0"
+    },
+
+    "repositories": {
+        "getopts": {
+            "type": "package",
+            "package": {
+                "name": "alexkazik/getopts",
+                "version": "1.0.0",
+                "source": {
+                    "url": "https://github.com/alexkazik/getopts",
+                    "type": "git",
+                    "reference": "master"
+                }
+            }
+        }
+    }
+}
