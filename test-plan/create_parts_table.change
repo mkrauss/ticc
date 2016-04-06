@@ -1,0 +1,10 @@
+depends: create_schema create_suppliers_table 
+
+set search_path="test_schema";
+
+create table parts (
+  primary key (supplier, part_code)
+
+  , supplier text
+  , part_code text
+);
