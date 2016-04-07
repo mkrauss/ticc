@@ -12,8 +12,7 @@ class Tic {
 
         $this->load_parameters($argv);
 
-        $this->config = $this->load_config(
-            F\pick($this->params, 'config file', 'tic.conf'));
+        $this->load_config();
 
         var_export(['called_as' => $this->called_as,
                     'command' => $this->command,
@@ -42,12 +41,14 @@ class Tic {
             exit;}}
 
 
-    private function load_config($file) {
+    private function load_config() {
         /*
-         * 
+         * Load the configuration file
          */
         
-    }
+        $this->config = json_decode(
+            file_get_contents(
+                F\pick($this->params, 'config file', 'tic.conf')), true);}
 
 
     public function run() {
