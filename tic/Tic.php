@@ -19,8 +19,8 @@ class Tic {
                     'command' => $this->command,
                     'params' => $this->params,
                     'args' => $this->args]);
-
         echo PHP_EOL;
+
         $this->connect_db();}
 
 
@@ -82,6 +82,7 @@ class Tic {
         /*
          * Loads a plan of changes from the given $plan_dir
          */
+
         $this->plan = new Plan ($plan_dir);}
 
 
