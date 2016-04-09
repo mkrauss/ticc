@@ -93,12 +93,7 @@ class Tic {
          */
 
         $this->db()->transaction(function($db) {
-            $this->deploy_changes(
-                empty($this->args)
-                ? $this->plan
-                : $this->plan->subplan(
-                    $this->deployed_changes(),
-                    array_shift($this->args)));});}
+            $this->intended_plan()->deploy($db);});}
 
 
     private function load_plan($plan_dir) {
@@ -107,6 +102,18 @@ class Tic {
          */
 
         $this->plan = new Plan ($plan_dir);}
+
+
+    private function intended_plan() {
+        /*
+         * Returns a potential plan based on the command line
+         * parameters
+         */
+        return empty($this->args)
+            ? $this->plan
+            : $this->plan->subplan(
+                $this->deployed_changes(),
+                array_shift($this->args));}
 
 
     private $called_as;
