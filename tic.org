@@ -1,0 +1,41 @@
+* Proposed plan file structure
+
+Rationale: Dependencies should be defined close to the sql files they
+describe. When looking at any directory, we should not see multiple
+items representing the same thing, such as =create_table.tic= and
+=create_table/=.
+
+- supply/
+  - supply/plan.tic
+  - supply/create_supply_schema/
+    - supply/create_supply_schema/plan.tic
+    - supply/create_supply_schema/deploy.sql
+    - supply/create_supply_schema/revert.sql
+    - supply/create_supply_schema/verify.sql
+  - supply/create_supplier_table/
+    - supply/create_supplier_table/plan.tic
+    - supply/create_supplier_table/deploy.sql
+    - supply/create_supplier_table/revert.sql
+    - supply/create_supplier_table/verify.sql
+  - supply/create_part_table/
+    - supply/create_part_table/plan.tic
+    - supply/create_part_table/deploy.sql
+    - supply/create_part_table/revert.sql
+    - supply/create_part_table/verify.sql
+- logistics/
+  - logistics/plan.tic
+  - logistics/create_logistics_schema/
+    - logistics/create_logistics_schema/plan.tic
+    - logistics/create_logistics_schema/deploy.sql
+    - logistics/create_logistics_schema/revert.sql
+    - logistics/create_logistics_schema/verify.sql
+  - logistics/create_shipper_table/
+    - logistics/create_shipper_table/plan.tic
+    - logistics/create_shipper_table/deploy.sql
+    - logistics/create_shipper_table/revert.sql
+    - logistics/create_shipper_table/verify.sql
+  - logistics/create_route_table/
+    - logistics/create_route_table/plan.tic
+    - logistics/create_route_table/deploy.sql
+    - logistics/create_route_table/revert.sql
+    - logistics/create_route_table/verify.sql

@@ -1,0 +1,3 @@
+{
+    depends: ["create_logistics_schema"]
+}

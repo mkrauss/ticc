@@ -1,0 +1,4 @@
+{
+    depends: ["supply/create_supply_schema",
+              "supply/create_supplier_table"]
+}
