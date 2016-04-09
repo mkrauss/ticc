@@ -79,11 +79,21 @@ class Tic {
          */
 
         switch ($this->command) {
+            case 'overview': $this->run_overview(); break;
             case 'deploy': $this->run_deploy(); break;
             case 'revert': $this->run_revert(); break;
             case 'redeploy': $this->run_redeploy(); break;
             default: throw new exception\BadCommandException(
                 'Must give valid command');}}
+
+
+    private function run_overview() {
+        /*
+         * Display an overview of of the plan that would be executed
+         * with DEPLOY. Takes the same arguments ad DEPLOY.
+         */
+        echo $this->intended_plan()->overview();
+    }
 
 
     private function run_deploy() {
