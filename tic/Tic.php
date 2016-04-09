@@ -17,8 +17,11 @@ class Tic {
         var_export(['called_as' => $this->called_as,
                     'command' => $this->command,
                     'params' => $this->params,
-                    'args' => $this->args]);
+                    'args' => $this->args,
+                    'config' => $this->config]);
         echo PHP_EOL;
+
+        $this->load_plan(F\pick($this->config, 'plan_directory', '.'));
 
         $this->connect_db();}
 
@@ -32,7 +35,7 @@ class Tic {
         $this->command = array_shift($argv);
 
         list($errors, $this->params, $this->args) = getopts(
-            ['config file' => ['Vs', 'c', 'conf']],
+            ['BAD config file' => ['Vs', 'c', 'conf']],
             $argv);
 
         if ($errors) {
@@ -48,7 +51,26 @@ class Tic {
         
         $this->config = json_decode(
             file_get_contents(
-                F\pick($this->params, 'config file', 'tic.conf')), true);}
+                F\pick($this->params, 'config file', 'tic.json')), true);}
+
+
+    private function connect_db() {
+        /*
+         * Connect to the database
+         */
+
+        if (empty($this->config['database']))
+            throw new exception\NoDatabaseException();
+
+        $database_engine = 'pgsql';
+
+        extract($this->config['database'], EXTR_PREFIX_ALL, 'database');
+
+        $this->database = new \PDO(
+            "{$database_engine}:"
+            . (isset($database_host) ? "host={$database_host};" : '')
+            . (isset($database_port) ? "port={$database_port};" : '')
+            . (isset($database_name) ? "dbname={$database_name}" : ''));}
 
 
     public function run() {
@@ -60,7 +82,7 @@ class Tic {
             case 'deploy': $this->run_deploy(); break;
             case 'revert': $this->run_revert(); break;
             case 'redeploy': $this->run_redeploy(); break;
-            default: throw new \tic\exception\BadCommandException(
+            default: throw new exception\BadCommandException(
                 'Must give valid command');}}
 
 
@@ -93,4 +115,6 @@ class Tic {
     private $params;
     private $args;
     private $config;
+    private $database;
+    private $plan;
 }

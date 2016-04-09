@@ -9,36 +9,53 @@ class Plan {
         /*
          * Configure the plan
          */
-        $this->plan = functions\topological_sort(
-            array_map(
-                function ($change_file) { return new Change($change_file); },
-                $this->change_files($change_dirname)),
+        $this->plan = \functions\topological_sort(
+            $this->changes($change_dirname),
             function ($change) { return $change->name(); },
             function ($change) { return $change->dependencies(); });}
 
 
-    public function change_files($change_dirname) {
+    public function changes($change_dirname) {
         /*
          * Get all plan files under $change_dirname
          */
         $recurser = function($change_dirname) use (&$recurser) {
-            return array_map(
-                function($filename) use ($change_dirname, $recurser) {
-                    $path = "{$change_dirname}/{$filename}";
+            $change_plan = [
+                'change_name' => basename($change_dirname),
+                'dependencies' => []];
 
-                    if ($filename === '.' || $filename === '..')
-                        return [];
+            $subchanges = [];
 
-                    if (is_dir($path))
-                        return $recurser($path);
+            foreach(scandir($change_dirname) as $filename) {
+                $path = "{$change_dirname}/{$filename}";
 
-                    if (!fnmatch('*.change', $filename))
-                        return [];
+                if ($filename === '.' || $filename === '..')
+                    continue;
 
-                    return $path;},
-                scandir($change_dirname));};
+                else if (is_dir($path))
+                    $subchanges = array_merge($subchanges, $recurser($path));
 
-        return F\flatten($recurser($change_dirname));}
+                else if (fnmatch('plan.json', $filename))
+                    $change_plan = array_replace_recursive(
+                        $change_plan,
+                        json_decode($path, true) ?? []);
+
+                else if (fnmatch('deploy.sql', $filename))
+                    $change_plan['deploy_script'] = file_get_contents($path);
+
+                else if (fnmatch('revert.sql', $filename))
+                    $change_plan['revert_script'] = file_get_contents($path);
+
+                else if (fnmatch('verify.sql', $filename))
+                    $change_plan['verify_script'] = file_get_contents($path);}
+
+            return array_merge(
+                [new Change ($change_plan)],
+                $subchanges);
+        };
+        // @TODO Maybe don't need the recurser now...
+
+        return $recurser($change_dirname);}
 
 
     private $plan;

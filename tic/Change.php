@@ -5,24 +5,26 @@ namespace tic;
 use Functional as F;
 
 class Change {
-    public function __construct($change_file) {
+    public function __construct($change_plan) {
         /*
          * Parse and load the $change_file
          */
-        $matches = [];
-        if (!preg_match('/(?:^depends: (\w+)$\n)?\n(.+)/sm',
-                        file_get_contents($change_file)))
-            throw new BadChangeException();
 
-        $this->dependencies = explode(' ', $matches[1]);
-        $this->body = $matches(2);
-        $this->name = basename($change_file, '.change');}
+        if (empty($change_plan['change_name']))
+            throw new BadChangeException('Missing name');
+
+        $this->name = $change_plan['change_name'];
+        $this->dependencies = F\pick($change_plan, 'depends', []);
+        $this->deploy_script = F\pick($change_plan, 'deploy_script', '');
+        $this->revert_script = F\pick($change_plan, 'revert_script', '');
+        $this->verify_script = F\pick($change_plan, 'verify_script', '');}
 
 
     public function dependencies() {
         /*
          * Return the list of changes this one depends on
          */
+
         return $this->dependencies;}
 
 
@@ -30,9 +32,13 @@ class Change {
         /*
          * Return the name of this change
          */
+
         return $this->name;}
+
 
     private $name;
     private $dependencies;
-    private $body;
+    private $deploy_script;
+    private $revert_script;
+    private $verify_script;
 }
