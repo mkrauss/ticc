@@ -1,3 +1,3 @@
 {
-    depends: ["supply/create_supply_schema"]
+    "dependencies": ["supply/create_supply_schema"]
 }

@@ -14,7 +14,7 @@ class Change {
             throw new BadChangeException('Missing name');
 
         $this->name = $change_plan['change_name'];
-        $this->dependencies = F\pick($change_plan, 'depends', []);
+        $this->dependencies = F\pick($change_plan, 'dependencies', []);
         $this->deploy_script = F\pick($change_plan, 'deploy_script', '');
         $this->revert_script = F\pick($change_plan, 'revert_script', '');
         $this->verify_script = F\pick($change_plan, 'verify_script', '');}
