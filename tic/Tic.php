@@ -14,12 +14,12 @@ class Tic {
 
         $this->load_config();
 
-        var_export(['called_as' => $this->called_as,
-                    'command' => $this->command,
-                    'params' => $this->params,
-                    'args' => $this->args,
-                    'config' => $this->config]);
-        echo PHP_EOL;
+        // var_export(['called_as' => $this->called_as,
+        //             'command' => $this->command,
+        //             'params' => $this->params,
+        //             'args' => $this->args,
+        //             'config' => $this->config]);
+        // echo PHP_EOL;
 
         $this->load_plan(F\pick($this->config, 'plan_directory', '.'));
 
@@ -92,7 +92,10 @@ class Tic {
          * Display an overview of of the plan that would be executed
          * with DEPLOY. Takes the same arguments ad DEPLOY.
          */
-        echo $this->intended_plan()->overview();
+        // $this->intended_plan()->inject_changes_to(
+        //     function ($change_name, $change_plan, $deploy, $verify, $revert) {
+        //         echo "{$change}\n";});
+        var_export($this->intended_plan()); echo PHP_EOL;
     }
 
 
