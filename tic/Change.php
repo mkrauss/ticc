@@ -20,6 +20,14 @@ class Change {
         $this->verify_script = F\pick($change_plan, 'verify_script', '');}
 
 
+    public function name() {
+        /*
+         * Return the name of this change
+         */
+
+        return $this->name;}
+
+
     public function dependencies() {
         /*
          * Return the list of changes this one depends on
@@ -28,12 +36,17 @@ class Change {
         return $this->dependencies;}
 
 
-    public function name() {
+    public function depends_on($change_name) {
         /*
-         * Return the name of this change
+         * Return true if this change directly or indirectly depends
+         * on a change called $change_name, including if it itself is
+         * such a change; otherwise false
          */
-
-        return $this->name;}
+        return $change_name === $this->name
+            || F\some(
+                $this->dependedncies,
+                function ($dependency) use ($change_name) {
+                    return $dependency->depends_on($change_name);});}
 
 
     private $name;
