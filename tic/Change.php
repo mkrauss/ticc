@@ -30,7 +30,7 @@ class Change {
 
     public function dependencies() {
         /*
-         * Return the list of changes this one depends on
+         * Return the list of changes this one immediately depends on
          */
 
         return $this->dependencies;}
