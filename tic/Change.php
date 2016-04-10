@@ -10,8 +10,8 @@ class Change {
          * Parse and load the $change_file
          */
 
-        if (empty($change_plan['change_name']))
-            throw new BadChangeException('Missing name');
+        if (!isset($change_plan['change_name']))
+            throw new exception\BadChangeException('Missing name');
 
         $this->name = $change_plan['change_name'];
         $this->dependencies = F\pick($change_plan, 'dependencies', []);

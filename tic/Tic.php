@@ -21,7 +21,7 @@ class Tic {
         //             'config' => $this->config]);
         // echo PHP_EOL;
 
-        $this->load_plan(F\pick($this->config, 'plan_directory', '.'));
+        $this->load_plan(F\pick($this->config, 'plan_directory', ''));
 
         $this->connect_db();}
 
