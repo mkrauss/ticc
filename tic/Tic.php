@@ -62,15 +62,7 @@ class Tic {
         if (empty($this->config['database']))
             throw new exception\NoDatabaseException();
 
-        $database_engine = 'pgsql';
-
-        extract($this->config['database'], EXTR_PREFIX_ALL, 'database');
-
-        $this->database = new \PDO(
-            "{$database_engine}:"
-            . (isset($database_host) ? "host={$database_host};" : '')
-            . (isset($database_port) ? "port={$database_port};" : '')
-            . (isset($database_name) ? "dbname={$database_name}" : ''));}
+        $this->database = new Database($this->config['database']);}
 
 
     public function run() {
@@ -105,8 +97,9 @@ class Tic {
          * dependencies of it, or all un-deployed changes.
          */
 
-        $this->db()->transaction(function($db) {
-            $this->intended_plan()->deploy($db);});}
+        $this->database->with_protection(function() {
+            $this->intended_plan()->inject_changes_to(
+                [$this->database, 'deploy_change']);});}
 
 
     private function load_plan($plan_dir) {
