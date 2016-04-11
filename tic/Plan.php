@@ -64,50 +64,44 @@ class Plan {
         /*
          * Get all plan files under $change_dirname
          */
-        $recurser = function($change_dirname)
-            use (&$recurser) {
-                $change_plan = [
-                    'change_name' => trim($change_dirname, '/'),
-                    'dependencies' => []];
+        $change_plan = [
+            'change_name' => trim($change_dirname, '/'),
+            'dependencies' => []];
 
-                $subchanges = [];
+        $subchanges = [];
 
-                if (is_readable("{$change_dirname}plan.json"))
-                    $change_plan = array_replace_recursive(
-                        $change_plan,
-                        json_decode(
-                            file_get_contents(
-                                "{$change_dirname}plan.json"), true) ?? []);
+        if (is_readable("{$change_dirname}plan.json"))
+            $change_plan = array_replace_recursive(
+                $change_plan,
+                json_decode(
+                    file_get_contents(
+                        "{$change_dirname}plan.json"), true) ?? []);
 
-                if (is_readable("{$change_dirname}deploy.sql"))
-                    $change_plan['deploy_script'] = file_get_contents(
-                        "{$change_dirname}deploy.sql");
+        if (is_readable("{$change_dirname}deploy.sql"))
+            $change_plan['deploy_script'] = file_get_contents(
+                "{$change_dirname}deploy.sql");
 
-                if (is_readable("{$change_dirname}revert.sql"))
-                    $change_plan['revert_script'] = file_get_contents(
-                        "{$change_dirname}revert.sql");
+        if (is_readable("{$change_dirname}revert.sql"))
+            $change_plan['revert_script'] = file_get_contents(
+                "{$change_dirname}revert.sql");
 
-                if (is_readable("{$change_dirname}verify.sql"))
-                    $change_plan['verify_script'] = file_get_contents(
-                        "{$change_dirname}verify.sql");
+        if (is_readable("{$change_dirname}verify.sql"))
+            $change_plan['verify_script'] = file_get_contents(
+                "{$change_dirname}verify.sql");
 
-                foreach(scandir(empty($change_dirname) ? '.' : $change_dirname)
-                        as $filename)
+        foreach(scandir(empty($change_dirname) ? '.' : $change_dirname)
+                as $filename)
 
-                    if ($filename !== '.' && $filename !== '..'
-                        && is_dir("{$change_dirname}{$filename}"))
+            if ($filename !== '.' && $filename !== '..'
+                && is_dir("{$change_dirname}{$filename}"))
 
-                        $subchanges = array_merge(
-                            $subchanges,
-                            $recurser("{$change_dirname}{$filename}/"));
+                $subchanges = array_merge(
+                    $subchanges,
+                    $this->changes("{$change_dirname}{$filename}/"));
 
-                return array_merge(
-                    [new Change ($change_plan)],
-                    $subchanges);
-            };
-        // @TODO Maybe don't need the recurser now...
-
-        return $recurser($change_dirname);}
+        return array_merge(
+            [new Change ($change_plan)],
+            $subchanges);}
 
 
     private $plan;
