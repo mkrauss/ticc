@@ -67,38 +67,39 @@ class Plan {
         $recurser = function($change_dirname)
             use (&$recurser) {
                 $change_plan = [
-                    'change_name' => $change_dirname,
+                    'change_name' => trim($change_dirname, '/'),
                     'dependencies' => []];
 
                 $subchanges = [];
 
+                if (is_readable("{$change_dirname}plan.json"))
+                    $change_plan = array_replace_recursive(
+                        $change_plan,
+                        json_decode(
+                            file_get_contents(
+                                "{$change_dirname}plan.json"), true) ?? []);
+
+                if (is_readable("{$change_dirname}deploy.sql"))
+                    $change_plan['deploy_script'] = file_get_contents(
+                        "{$change_dirname}deploy.sql");
+
+                if (is_readable("{$change_dirname}revert.sql"))
+                    $change_plan['revert_script'] = file_get_contents(
+                        "{$change_dirname}revert.sql");
+
+                if (is_readable("{$change_dirname}verify.sql"))
+                    $change_plan['verify_script'] = file_get_contents(
+                        "{$change_dirname}verify.sql");
+
                 foreach(scandir(empty($change_dirname) ? '.' : $change_dirname)
-                        as $filename) {
-                    $path = empty($change_dirname)
-                        ? $filename
-                        : "{$change_dirname}/{$filename}";
+                        as $filename)
 
-                    if ($filename === '.' || $filename === '..')
-                        continue;
+                    if ($filename !== '.' && $filename !== '..'
+                        && is_dir("{$change_dirname}{$filename}"))
 
-                    else if (is_dir($path))
                         $subchanges = array_merge(
                             $subchanges,
-                            $recurser($path));
-
-                    else if (fnmatch('plan.json', $filename)) {
-                        $change_plan = array_replace_recursive(
-                            $change_plan,
-                            json_decode(file_get_contents($path), true) ?? []);}
-
-                    else if (fnmatch('deploy.sql', $filename))
-                        $change_plan['deploy_script'] = file_get_contents($path);
-
-                    else if (fnmatch('revert.sql', $filename))
-                        $change_plan['revert_script'] = file_get_contents($path);
-
-                    else if (fnmatch('verify.sql', $filename))
-                        $change_plan['verify_script'] = file_get_contents($path);}
+                            $recurser("{$change_dirname}{$filename}/"));
 
                 return array_merge(
                     [new Change ($change_plan)],
