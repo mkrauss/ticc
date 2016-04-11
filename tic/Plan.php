@@ -60,22 +60,28 @@ class Plan {
             $change->inject_to($fn);}
 
 
-    private function changes($change_dirname) {
+    private function changes($change_dirname, $implicit_dependencies = []) {
         /*
          * Get all plan files under $change_dirname
          */
         $change_plan = [
             'change_name' => trim($change_dirname, '/'),
-            'dependencies' => []];
+            'dependencies' => $implicit_dependencies];
 
         $subchanges = [];
 
-        if (is_readable("{$change_dirname}plan.json"))
-            $change_plan = array_replace_recursive(
-                $change_plan,
-                json_decode(
-                    file_get_contents(
-                        "{$change_dirname}plan.json"), true) ?? []);
+        if (is_readable("{$change_dirname}plan.json")) {
+            $change_plan_file = json_decode(file_get_contents(
+                "{$change_dirname}plan.json"), true);
+
+            if (isset($change_plan_file['change_name']))
+                $change_plan['change_name'] = $change_plan_file['change_name'];
+
+            if (isset($change_plan_file['dependencies']))
+                $change_plan['dependencies'] = array_unique(array_merge(
+                    $change_plan['dependencies'],
+                    $change_plan_file['dependencies']));
+        }
 
         if (is_readable("{$change_dirname}deploy.sql"))
             $change_plan['deploy_script'] = file_get_contents(
@@ -97,7 +103,8 @@ class Plan {
 
                 $subchanges = array_merge(
                     $subchanges,
-                    $this->changes("{$change_dirname}{$filename}/"));
+                    $this->changes("{$change_dirname}{$filename}/",
+                                   $change_plan['dependencies']));
 
         return array_merge(
             [new Change ($change_plan)],
