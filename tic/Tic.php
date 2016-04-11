@@ -84,11 +84,9 @@ class Tic {
          * Display an overview of of the plan that would be executed
          * with DEPLOY. Takes the same arguments ad DEPLOY.
          */
-        // $this->intended_plan()->inject_changes_to(
-        //     function ($change_name, $change_plan, $deploy, $verify, $revert) {
-        //         echo "{$change}\n";});
-        var_export($this->intended_plan()); echo PHP_EOL;
-    }
+        $this->intended_plan()->inject_changes_to(
+            function ($name, $dependencies, $deploy, $verify, $revert) {
+                echo "{$name}\n";});}
 
 
     private function run_deploy() {

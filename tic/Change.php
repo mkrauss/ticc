@@ -49,6 +49,18 @@ class Change {
                     return $dependency->depends_on($change_name);});}
 
 
+    public function inject_to($fn) {
+        /*
+         * Call $fn passing it: $change_name, $change_plan, $deploy,
+         * $verify, $revert
+         */
+        $fn($this->name,
+            $this->dependencies,
+            $this->deploy_script,
+            $this->verify_script,
+            $this->revert_script);}
+
+
     private $name;
     private $dependencies;
     private $deploy_script;

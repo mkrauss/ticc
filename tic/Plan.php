@@ -52,6 +52,14 @@ class Plan {
         return $change;}
 
 
+    public function inject_changes_to($fn) {
+        /*
+         * Ask each change in the plan to inject_to $fn
+         */
+        foreach ($this->plan as $change)
+            $change->inject_to($fn);}
+
+
     private function changes($change_dirname) {
         /*
          * Get all plan files under $change_dirname
