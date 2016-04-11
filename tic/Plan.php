@@ -106,6 +106,12 @@ class Plan {
                     $this->changes("{$change_dirname}{$filename}/",
                                    $change_plan['dependencies']));
 
+        $change_plan['dependencies'] = array_unique(array_merge(
+            $change_plan['dependencies'],
+            array_map(
+                function ($subchange) { return $subchange->name(); },
+                $subchanges)));
+
         return array_merge(
             [new Change ($change_plan)],
             $subchanges);}
