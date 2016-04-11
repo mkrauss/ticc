@@ -49,8 +49,7 @@ class Plan {
             throw new BadChangeException(
                 "Cannot find change named {$change_name}");
 
-        return $change;
-    }
+        return $change;}
 
 
     private function changes($change_dirname) {
