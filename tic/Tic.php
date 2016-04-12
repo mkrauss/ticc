@@ -113,11 +113,9 @@ class Tic {
          * Returns a potential plan based on the command line
          * parameters
          */
-        return empty($this->args)
-            ? $this->plan
-            : $this->plan->subplan(
-                $this->deployed_changes(),
-                array_shift($this->args));}
+        return $this->plan->subplan(
+            $this->deployed_changes(),
+            empty($this->args) ? null : array_shift($this->args));}
 
 
     private $called_as;
