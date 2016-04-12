@@ -15,21 +15,34 @@ class Plan {
             function ($change) { return $change->dependencies(); });}
 
 
-    public function subplan($deployed_change_names, $target_change_name) {
+    public function subplan($deployed_change_names, $target_change_name=null) {
         /*
          * Returns a new Plan representing the necessary changes to
          * deploy $target_change assuming that the array of
          * $deployed_changes are already deployed
          */
-        $target_change = $this->find_change_by_name($target_change_name);
+        $target_change = isnull($target_change_name)
+            ? null
+            : $this->find_change_by_name($target_change_name);
 
         $subplan = clone($this);
+
         $subplan->plan = F\select(
             $this->plan,
-            function ($proposed_change)
+
+            isnull($target_change)
+
+            ? function ($proposed_change)
+                use ($deployed_change_names) {
+                    $proposed_change_name = $proposed_change->name();
+                    return !F\contains($deployed_change_names,
+                                       $proposed_change_name);}
+
+            : function ($proposed_change)
                 use ($deployed_change_names, $target_change) {
                     $proposed_change_name = $proposed_change->name();
-                    return !F\contains($deployed_change_names, $proposed_change_name)
+                    return !F\contains($deployed_change_names,
+                                       $proposed_change_name)
                         && $target_change->depends_on($proposed_change_name);});
 
         return $subplan;}
