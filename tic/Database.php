@@ -98,6 +98,12 @@ class Database {
          */
         $this->with_protection(function() {
             try {
+                $this->exec($verify);
+                throw new exception\ChangeDeploymentError(
+                    "Change {$change_name} verifies before deploy");}
+            catch (\PDOException $ignore) {}
+
+            try {
                 $this->exec($deploy);}
             catch (\PDOException $error) {
                 throw new exception\ChangeDeploymentError(
