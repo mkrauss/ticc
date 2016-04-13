@@ -114,7 +114,7 @@ class Tic {
          * parameters
          */
         return $this->plan->subplan(
-            $this->deployed_changes(),
+            $this->database->deployed_changes(),
             empty($this->args) ? null : array_shift($this->args));}
 
 
