@@ -157,6 +157,7 @@ class Database {
 
     
     private $database;
+    private $schema;
     private $savepoint_count;
     private $in_transaction;
 }
