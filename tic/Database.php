@@ -83,6 +83,15 @@ class Database {
         return $result;}
 
 
+    public function deployed_changes() {
+        /*
+         * Fetch and return an array of currently deployed changes
+         */
+        return $this->database->query("
+            select change from \"{$this->schema}\".deployed;")
+            ->fetchAll(\PDO::FETCH_COLUMN, 0);}
+
+
     private function deploy_change($change_name, $plan, $deploy, $verify, $revert) {
         /*
          * Deploy a change, making sure it is complete, and mark it deployed
