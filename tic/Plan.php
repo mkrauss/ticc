@@ -21,7 +21,7 @@ class Plan {
          * deploy $target_change assuming that the array of
          * $deployed_changes are already deployed
          */
-        $target_change = isnull($target_change_name)
+        $target_change = is_null($target_change_name)
             ? null
             : $this->find_change_by_name($target_change_name);
 
@@ -30,7 +30,7 @@ class Plan {
         $subplan->plan = F\select(
             $this->plan,
 
-            isnull($target_change)
+            is_null($target_change)
 
             ? function ($proposed_change)
                 use ($deployed_change_names) {
@@ -58,7 +58,7 @@ class Plan {
             null,
             function ($change) { return $change->name(); });
 
-        if (isnull($change))
+        if (is_null($change))
             throw new BadChangeException(
                 "Cannot find change named {$change_name}");
 
