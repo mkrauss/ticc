@@ -125,11 +125,11 @@ class Database {
                     "Change {$change_name} failed to re-verify");}});}
 
 
-    public function exec($query) {
+    public function exec($statement) {
         /*
          * Just a pass-thru to PDO::exec
          */
-        return $this->database->exec($query);
+        return $this->database->exec($statement);
     }
 
 
