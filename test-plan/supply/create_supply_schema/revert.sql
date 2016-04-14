@@ -1,2 +1,1 @@
-
 drop schema "supply";
