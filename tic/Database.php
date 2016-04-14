@@ -92,60 +92,109 @@ class Database {
             ->fetchAll(\PDO::FETCH_COLUMN, 0);}
 
 
-    private function deploy_change($change_name, $plan, $deploy, $verify, $revert) {
+    public function deploy_change($change_name, $plan, $deploy, $verify, $revert) {
         /*
          * Deploy a change, making sure it is complete, and mark it deployed
          */
-        $this->with_protection(function() {
-            try {
-                $this->exec($verify);
-                throw new exception\ChangeDeploymentError(
-                    "Change {$change_name} verifies before deploy");}
-            catch (\PDOException $ignore) {}
+        $this->with_protection(
+            function() use ($change_name, $plan, $deploy, $verify, $revert) {
 
-            try {
-                $this->exec($deploy);}
-            catch (\PDOException $error) {
-                throw new exception\ChangeDeploymentError(
-                    "Change {$change_name} failed to deploy");}
+                $this->exec_to_fail(
+                    $verify, new exception\ChangeDeploymentError(
+                        "Change {$change_name} verifies before deploy"));
 
-            try {
-                $this->exec($verify);}
-            catch (\PDOException $error) {
-                throw new exception\ChangeDeploymentError(
-                    "Change {$change_name} failed to verify");}
+                $this->exec(
+                    $deploy, new exception\ChangeDeploymentError(
+                        "Change {$change_name} failed to deploy"));
 
-            try {
-                $this->exec($revert);}
-            catch (\PDOException $error) {
-                throw new exception\ChangeDeploymentError(
-                    "Change {$change_name} failed to revert");}
+                $this->exec_to_rollback(
+                    $verify, new exception\ChangeDeploymentError(
+                        "Change {$change_name} failed to verify"));
 
-            try {
-                $this->exec($verify);
-                throw new exception\ChangeDeploymentError(
-                    "Change {$change_name} verifies after revert");}
-            catch (\PDOException $ignore) {}
+                $this->exec(
+                    $revert, new exception\ChangeDeploymentError(
+                        "Change {$change_name} failed to revert"));
 
-            try {
-                $this->exec($deploy);}
-            catch (\PDOException $error) {
-                throw new exception\ChangeDeploymentError(
-                    "Change {$change_name} failed to re-deploy");}
+                $this->exec_to_fail(
+                    $verify, new exception\ChangeDeploymentError(
+                        "Change {$change_name} verifies after revert"));
 
-            try {
-                $this->exec($verify);}
-            catch (\PDOException $error) {
-                throw new exception\ChangeDeploymentError(
-                    "Change {$change_name} failed to re-verify");}});}
+                $this->exec(
+                    $deploy, new exception\ChangeDeploymentError(
+                        "Change {$change_name} failed to re-deploy"));
+
+                $this->exec_to_rollback(
+                    $verify, new exception\ChangeDeploymentError(
+                        "Change {$change_name} failed to re-verify"));
+
+                $this->mark_deployed($change_name, json_encode($plan),
+                                     $deploy, $verify, $revert);});}
 
 
-    public function exec($statement) {
+    private function mark_deployed($change_name, $plan,
+                                   $deploy, $verify, $revert) {
         /*
-         * Just a pass-thru to PDO::exec
+         * Mark the given change deployed in the database
          */
-        return $this->database->exec($statement);
-    }
+        try {
+            $this->database->exec("
+                insert into \"{$this->schema}\".deployed values (
+                       {$this->database->quote($change_name)}
+                     , current_timestamp
+                     , {$this->database->quote($plan)}
+                     , {$this->database->quote($deploy)}
+                     , {$this->database->quote($verify)}
+                     , {$this->database->quote($revert)});");}
+        catch (\PDOException $error) {
+            throw new exception\FailureToMarkChange(
+                "Could not track change {$change_name}");}}
+
+
+    public function exec($statement, $exception = null) {
+        /*
+         * Execute $statement with protection and optionally throw
+         * $exception if it fails. If it fails and $exception is null
+         * just rethrow the original.
+         */
+        try {
+            $this->with_protection(function () use ($statement) {
+                return $this->database->exec($statement);});}
+        catch (\PDOException $error) {
+            throw $exception ?? $error;}}
+
+
+    public function exec_to_fail($statement, $exception = null) {
+        /*
+         * Execute $statement with protection and optionally throw
+         * $exception if *doesn't* fail. If it doesn't fail and
+         * $exception is null throw a generic exception.
+         */
+        try {
+            $this->with_protection(function () use ($statement) {
+                return $this->database->exec($statement);});
+            throw $exception ?? new Exception(
+                'A statement intended to fail succeeded');}
+        catch (\PDOException $ignore) {}}
+
+
+    public function exec_to_rollback($statement, $exception = null) {
+        /*
+         * Execute $statement with protection and optionally throw
+         * $exception if it fails. If it fails and $exception is null,
+         * just rethrow the original. However, if it succeeds,
+         * rollback the protection wrapper so it has no effect.
+         */
+        $result = null;
+
+        try {
+            $this->with_protection(function () use ($statement, &$result) {
+                $result = $this->database->exec($statement);
+                throw new exception\CancelTransaction();});}
+        catch (\PDOException $error) {
+            throw $exception ?? $error;}
+        catch (exception\CancelTransaction $ignore) {}
+
+        return $result;}
 
 
     private function ensure_tic() {
