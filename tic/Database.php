@@ -46,22 +46,22 @@ class Database {
 
         try {
             $result = $fn();}
-        catch (\PDOException $exception) {
-            $this->in_transaction = false;
+        catch (\Exception $exception) {
             $this->database->rollBack();
             throw $exception;}
+        finally {
+            $this->in_transaction = false;}
 
-        $this->in_transaction = false;
         $this->database->commit();
         return $result;}
 
 
-    public function with_savepoint($fn, $savepoint = null) {
+    public function with_savepoint($fn, $savepoint_name = null) {
         /*
          * Effectively emulate a sub-transaction running $fn with a
          * savepoint. If specified, name it $savepoint.
          */
-        $savepoint = $savepoint ?? "tic_savepoint_{$this->savepoint_count}";
+        $savepoint_name = $savepoint_name ?? "tic_savepoint_{$this->savepoint_count}";
 
         if (!$this->in_transaction)
             throw new exception\TransactionError(
@@ -69,16 +69,16 @@ class Database {
                 . " while not in a transaction");
 
         $this->exec("savepoint {$savepoint_name};");
-        ++ $savepoint_count;
+        ++ $this->savepoint_count;
 
         try {
             $result = $fn();}
-        catch (\PDOException $exception) {
-            -- $savepoint_count;
+        catch (\Exception $exception) {
             $this->exec("rollback to savepoint {$savepoint_name};");
             throw $exception;}
+        finally {
+            -- $this->savepoint_count;}
 
-        -- $savepoint_count;
         $this->exec("release savepoint {$savepoint_name};");
         return $result;}
 
