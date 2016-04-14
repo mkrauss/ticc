@@ -44,7 +44,7 @@ class Change {
          */
         return $change_name === $this->name
             || F\some(
-                $this->dependedncies,
+                $this->dependencies,
                 function ($dependency) use ($change_name) {
                     return $dependency->depends_on($change_name);});}
 
