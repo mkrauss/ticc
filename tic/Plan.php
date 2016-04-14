@@ -52,17 +52,16 @@ class Plan {
         /*
          * Find the change named $change_name in the plan
          */
-        $change = F\pick(
+        $matches = F\select(
             $this->plan,
-            $change_name,
-            null,
-            function ($change) { return $change->name(); });
+            function ($change) use ($change_name) {
+                return $change_name === $change->name(); });
 
-        if (is_null($change))
+        if (!isset($matches[0]))
             throw new BadChangeException(
                 "Cannot find change named {$change_name}");
 
-        return $change;}
+        return $matches[0];}
 
 
     public function inject_changes_to($fn) {
