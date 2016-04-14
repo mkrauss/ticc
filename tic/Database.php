@@ -68,18 +68,18 @@ class Database {
                 "Tried to invoke savepoint {$savepoint}"
                 . " while not in a transaction");
 
-        $this->exec("savepoint {$savepoint_name};");
+        $this->database->exec("savepoint {$savepoint_name};");
         ++ $this->savepoint_count;
 
         try {
             $result = $fn();}
         catch (\Exception $exception) {
-            $this->exec("rollback to savepoint {$savepoint_name};");
+            $this->database->exec("rollback to savepoint {$savepoint_name};");
             throw $exception;}
         finally {
             -- $this->savepoint_count;}
 
-        $this->exec("release savepoint {$savepoint_name};");
+        $this->database->exec("release savepoint {$savepoint_name};");
         return $result;}
 
 
@@ -160,8 +160,8 @@ class Database {
                 ->fetchColumn())
                 return true;
 
-            $this->exec("create schema \"{$this->schema}\";");
-            $this->exec("
+            $this->database->exec("create schema \"{$this->schema}\";");
+            $this->database->exec("
                 create table \"{$this->schema}\".deployed (
                     change text
                   , deployed_at timestamptz
