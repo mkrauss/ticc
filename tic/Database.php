@@ -205,11 +205,12 @@ class Database {
         $this->with_transaction(function () {
             if ($this->database->query("
                 select '{$this->schema}' in (
-                    select schema_name from information_schema.schemata);")
-                ->fetchColumn())
+                    select schema_name
+                    from information_schema.schemata);")->fetchColumn())
                 return true;
 
             $this->database->exec("create schema \"{$this->schema}\";");
+
             $this->database->exec("
                 create table \"{$this->schema}\".deployed (
                     change text
