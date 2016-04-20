@@ -144,10 +144,16 @@ class Database {
                      , {$this->database->quote($plan)}
                      , {$this->database->quote($deploy)}
                      , {$this->database->quote($verify)}
-                     , {$this->database->quote($revert)});");}
+                     , {$this->database->quote($revert)});");
+            $this->database->exec("
+                insert into \"{$this->schema}\".deployed_after
+                    select {$this->database->quote($change_name)} as change
+                         , change as after
+                    from \"{$this->schema}\".deployed;");}
         catch (\PDOException $error) {
             throw new exception\FailureToMarkChange(
-                "Could not track change {$change_name}");}}
+                "Could not track change {$change_name}",
+                $error->getCode(), $error);}}
 
 
     public function exec($statement, $exception = null) {
