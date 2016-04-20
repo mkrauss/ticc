@@ -1,4 +1,4 @@
-set schema "logistics";
+set search_path="logistics";
 
 create table "route" (
     "route" text primary key

@@ -11,13 +11,23 @@ class Change {
          */
 
         if (!isset($change_plan['change_name']))
-            throw new exception\BadChangeException('Missing name');
+            throw new exception\BadChangeException('Change missing name');
 
         $this->name = $change_plan['change_name'];
         $this->dependencies = F\pick($change_plan, 'dependencies', []);
-        $this->deploy_script = F\pick($change_plan, 'deploy_script', '');
-        $this->revert_script = F\pick($change_plan, 'revert_script', '');
-        $this->verify_script = F\pick($change_plan, 'verify_script', '');}
+
+        if (isset($change_plan['deploy_script'])
+            && isset($change_plan['revert_script'])
+            && isset($change_plan['verify_script'])) {
+
+            $this->deploy_script = F\pick($change_plan, 'deploy_script', '');
+            $this->revert_script = F\pick($change_plan, 'revert_script', '');
+            $this->verify_script = F\pick($change_plan, 'verify_script', '');}
+
+        elseif (isset($change_plan['deploy_script'])
+                || isset($change_plan['revert_script'])
+                || isset($change_plan['verify_script'])) {
+            throw new exception\BadChangeException("Incomplete change {$this->name}");}}
 
 
     public function name() {
@@ -38,15 +48,13 @@ class Change {
 
     public function depends_on($change_name) {
         /*
-         * Return true if this change directly or indirectly depends
-         * on a change called $change_name, including if it itself is
-         * such a change; otherwise false
+         * Return true if this change directly depends on a change
+         * called $change_name, otherwise false
          */
-        return $change_name === $this->name
-            || F\some(
-                $this->dependencies,
-                function ($dependency) use ($change_name) {
-                    return $dependency->depends_on($change_name);});}
+        return F\some(
+            $this->dependencies,
+            function ($dependency) use ($change_name) {
+                return $dependency === $change_name;});}
 
 
     public function inject_to($fn) {

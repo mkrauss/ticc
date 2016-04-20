@@ -131,6 +131,56 @@ class Database {
                                      $deploy, $verify, $revert);});}
 
 
+    public function revert_through($change_name) {
+        /*
+         * Revert all deployed changes back to and including the one
+         * named $change_name
+         */
+        $this->with_protection(
+            function() use ($change_name) {
+                $changes_to_revert = $this->database->query("
+                    select change, revert
+                    from \"{$this->schema}\".deployed
+                    natural join (
+                        select change
+                             , after
+                             , count(after) over (partition by change) as num
+                        from \"{$this->schema}\".deployed_after) change_w_num
+                    where after = {$this->database->quote($change_name)}
+                    order by num desc;")
+                    ->fetchAll();
+
+                foreach($changes_to_revert as $to_revert)
+                    $this->revert_change($to_revert['change'],
+                                         $to_revert['revert']);});}
+
+
+    private function revert_change($change_name, $revert) {
+        /*
+         * Revert a single change $change_name with script $revert
+         */
+        $this->database->exec($revert);
+        $this->unmark_deployed($change_name);
+    }
+
+
+    private function unmark_deployed($change_name) {
+        /*
+         * Remove the deployment info for the given chnage 
+         */
+        try {
+            $this->database->exec("
+                delete from \"{$this->schema}\".deployed
+                where change = {$this->database->quote($change_name)};");
+            $this->database->exec("
+                delete from \"{$this->schema}\".deployed_after
+                where change = {$this->database->quote($change_name)};");}
+        catch (\PDOException $error) {
+            throw new exception\FailureToMarkChange(
+                "Could not clear change record {$change_name}",
+                $error->getCode(), $error);}}
+
+
     private function mark_deployed($change_name, $plan,
                                    $deploy, $verify, $revert) {
         /*
@@ -182,8 +232,12 @@ class Database {
         try {
             $this->with_protection(function () use ($statement) {
                 return $this->database->exec($statement);});
-            throw $exception ?? new Exception(
-                'A statement intended to fail succeeded');}
+            if (isset($exception)) {
+                $exception->add_reason($error->getMessage());
+                throw $exception; }
+            else
+                throw new Exception(
+                    'A statement intended to fail succeeded');}
         catch (\PDOException $ignore) {}}
 
 
@@ -201,7 +255,11 @@ class Database {
                 $result = $this->database->exec($statement);
                 throw new exception\CancelTransaction();});}
         catch (\PDOException $error) {
-            throw $exception ?? $error;}
+            if (isset($exception)) {
+                $exception->add_reason($error->getMessage());
+                throw $exception; }
+            else
+                throw $error;}
         catch (exception\CancelTransaction $ignore) {}
 
         return $result;}
@@ -228,7 +286,11 @@ class Database {
                   , plan jsonb
                   , deploy text
                   , verify text
-                  , revert text);");});}
+                  , revert text);");
+            $this->database->exec("
+                create table \"{$this->schema}\".deployed_after (
+                    change text
+                  , after text);");});}
 
     
     private $database;

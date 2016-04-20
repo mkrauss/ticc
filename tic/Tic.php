@@ -94,10 +94,28 @@ class Tic {
          * Deploy a set of changes - a target change and all
          * dependencies of it, or all un-deployed changes.
          */
-
         $this->database->with_protection(function() {
             $this->intended_plan()->inject_changes_to(
-                [$this->database, 'deploy_change']);});}
+                function ($change_name, $plan, $deploy, $verify, $revert) {
+                    echo "Deploying: {$change_name}... ";
+                    if (is_null($deploy))
+                        echo "Nothing to deploy.\n";
+                    else {
+                        $this->database->deploy_change($change_name, $plan, $deploy, $verify, $revert);
+                        echo " Done.\n";}});});}
+
+
+    private function run_revert() {
+        /*
+         * Revert all changes made back to and including the one
+         * specified in the command
+         */
+        if (empty($this->args))
+            throw new exception\BadCommandException(
+                'Must give change to revert');
+        $this->database->with_protection(function() {
+            $this->database->revert_through(
+                array_shift($this->args));});}
 
 
     private function load_plan($plan_dir) {
@@ -113,9 +131,14 @@ class Tic {
          * Returns a potential plan based on the command line
          * parameters
          */
-        return $this->plan->subplan(
-            $this->database->deployed_changes(),
-            empty($this->args) ? null : array_shift($this->args));}
+        static $plan = null;
+
+        if (is_null($plan))
+            $plan = $this->plan->subplan(
+                $this->database->deployed_changes(),
+                empty($this->args) ? null : array_shift($this->args));
+
+        return $plan;}
 
 
     private $called_as;
