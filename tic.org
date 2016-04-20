@@ -41,6 +41,10 @@ items representing the same thing, such as =create_table.tic= and
     - logistics/create_route_table/verify.sql
 * How to get changes from git
 
+This may not be necessary, as I am looking at a way to look at changed
+files based on what was deployed versus what is on disk directly,
+which would be better...
+
 We can get the current commit HEAD hash with =rev-parse= and store
 that when we deploy changes. We can then use =diff= to get the changes
 between the last deployed and current versions, and pipe through
@@ -56,3 +60,44 @@ revert all modified changes and re-deploy!
       | xargs -L1 dirname \
       | uniq
 #+end_src
+
+* TODO Re-engineer revert based on dependencies
+
+Should revert only the requested target and all changes which depend
+directly or indirectly on it.
+
+At the same time, this is a good chance to refactor to do reversion by
+creating a plan and running it backwards, which will be handy for [[*Add ability to detect changes to changes][Add
+ability to detect changes to changes]]
+
+Consider: ability to load the currently deployed Plan from the
+database. In such case, we don't need to directly rely on the database
+to create specialized plans. Operations only on loaded plans create
+specialized plans:
+
+- deploy :: (master plan - deployed plan) -> deploy
+- revert :: (deployed plan) -> revert
+- rebase :: (deployed plan 𝝙 master plan) -> revert -> deploy
+- update ::
+  1. (deployed plan 𝝙 master plan) -> revert
+  2. (master plan - deployed plan) -> deploy
+- sync :: 
+  1. (deployed plan 𝝙 master plan) -> revert
+  2. (deployed plan - master plan) -> revert
+  3. (master plan - deployed plan) -> deploy
+
+* TODO Add ability to detect changes to changes
+
+So we can query the database and see if a change from the plan is
+different from what is in the database.
+
+I would like to be able to have a redeploy function that just
+redeploys anything that has changed.
+
+Things needed:
+
+- Database function that tells if a change is different from what's
+  deployed
+- Ability to filter and create a new plan of only those changes and
+  the ones that depend on them
+- Fix revert to be based on running a plan backwards
