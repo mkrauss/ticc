@@ -166,7 +166,11 @@ class Database {
             $this->with_protection(function () use ($statement) {
                 return $this->database->exec($statement);});}
         catch (\PDOException $error) {
-            throw $exception ?? $error;}}
+            if (isset($exception)) {
+                $exception->add_reason($error->getMessage());
+                throw $exception; }
+            else
+                throw $error;}}
 
 
     public function exec_to_fail($statement, $exception = null) {
