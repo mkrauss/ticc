@@ -123,7 +123,7 @@ class Tic {
          * Loads a plan of changes from the given $plan_dir
          */
 
-        $this->plan = new Plan ($plan_dir);}
+        $this->plan = new Plan(Plan::changes($plan_dir));}
 
 
     private function intended_plan() {

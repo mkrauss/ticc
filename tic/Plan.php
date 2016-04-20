@@ -5,12 +5,12 @@ namespace tic;
 use Functional as F;
 
 class Plan {
-    public function __construct($change_dirname) {
+    public function __construct($changes) {
         /*
          * Configure the plan
          */
         $this->plan = \functions\topological_sort(
-            $this->changes($change_dirname),
+            $changes,
             function ($change) { return $change->name(); },
             function ($change) { return $change->dependencies(); });}
 
@@ -93,7 +93,7 @@ class Plan {
             $change->inject_to($fn);}
 
 
-    private function changes($change_dirname, $implicit_dependencies = []) {
+    static public function changes($change_dirname, $implicit_dependencies = []) {
         /*
          * Get all plan files under $change_dirname
          */
@@ -136,8 +136,8 @@ class Plan {
 
                 $subchanges = array_merge(
                     $subchanges,
-                    $this->changes("{$change_dirname}{$filename}/",
-                                   $change_plan['dependencies']));
+                    static::changes("{$change_dirname}{$filename}/",
+                                    $change_plan['dependencies']));
 
         $change_plan['dependencies'] = array_unique(array_merge(
             $change_plan['dependencies'],
