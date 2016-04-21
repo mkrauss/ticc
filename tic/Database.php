@@ -92,12 +92,12 @@ class Database {
             ->fetchAll(\PDO::FETCH_COLUMN, 0);}
 
 
-    public function deploy_change($change_name, $plan, $deploy, $verify, $revert) {
+    public function deploy_change($change_name, $dependencies, $deploy, $verify, $revert) {
         /*
          * Deploy a change, making sure it is complete, and mark it deployed
          */
         $this->with_protection(
-            function() use ($change_name, $plan, $deploy, $verify, $revert) {
+            function() use ($change_name, $dependencies, $deploy, $verify, $revert) {
 
                 $this->exec_to_fail(
                     $verify, new exception\ChangeDeploymentError(
@@ -127,7 +127,7 @@ class Database {
                     $verify, new exception\ChangeDeploymentError(
                         "Change {$change_name} failed to re-verify"));
 
-                $this->mark_deployed($change_name, json_encode($plan),
+                $this->mark_deployed($change_name, json_encode($dependencies),
                                      $deploy, $verify, $revert);});}
 
 
@@ -181,7 +181,7 @@ class Database {
                 $error->getCode(), $error);}}
 
 
-    private function mark_deployed($change_name, $plan,
+    private function mark_deployed($change_name, $dependencies,
                                    $deploy, $verify, $revert) {
         /*
          * Mark the given change deployed in the database
@@ -191,7 +191,7 @@ class Database {
                 insert into \"{$this->schema}\".deployed values (
                        {$this->database->quote($change_name)}
                      , current_timestamp
-                     , {$this->database->quote($plan)}
+                     , {$this->database->quote($dependencies)}
                      , {$this->database->quote($deploy)}
                      , {$this->database->quote($verify)}
                      , {$this->database->quote($revert)});");
@@ -283,7 +283,7 @@ class Database {
                 create table \"{$this->schema}\".deployed (
                     change text
                   , deployed_at timestamptz
-                  , plan jsonb
+                  , dependencies jsonb
                   , deploy text
                   , verify text
                   , revert text);");
