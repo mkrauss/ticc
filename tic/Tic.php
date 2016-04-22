@@ -21,9 +21,9 @@ class Tic {
         //             'config' => $this->config]);
         // echo PHP_EOL;
 
-        $this->load_plan(F\pick($this->config, 'plan_directory', ''));
+        $this->connect_db();
 
-        $this->connect_db();}
+        $this->load_plans(F\pick($this->config, 'plan_directory', ''));}
 
 
     private function load_parameters($argv) {
@@ -118,12 +118,13 @@ class Tic {
                 array_shift($this->args));});}
 
 
-    private function load_plan($plan_dir) {
+    private function load_plans($plan_dir) {
         /*
          * Loads a plan of changes from the given $plan_dir
          */
 
-        $this->plan = new Plan(Plan::changes($plan_dir));}
+        $this->masterplan = new Plan(Plan::changes($plan_dir));
+        $this->deployedplan = new Plan($this->database->deployed_changes());}
 
 
     private function intended_plan() {
@@ -148,5 +149,6 @@ class Tic {
     private $args;
     private $config;
     private $database;
-    private $plan;
+    private $masterplan;
+    private $deployedplan;
 }
