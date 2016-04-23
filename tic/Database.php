@@ -171,9 +171,6 @@ class Database {
         try {
             $this->database->exec("
                 delete from \"{$this->schema}\".deployed
-                where change = {$this->database->quote($change_name)};");
-            $this->database->exec("
-                delete from \"{$this->schema}\".deployed_after
                 where change = {$this->database->quote($change_name)};");}
         catch (\PDOException $error) {
             throw new exception\FailureToMarkChange(
@@ -186,20 +183,24 @@ class Database {
         /*
          * Mark the given change deployed in the database
          */
+        $dependencies = '{'
+            . implode(
+                ',',
+                array_map(
+                    function ($dependency) {
+                        return "\"{$dependency}\""; },
+                    $dependencies))
+            . '}';
+
         try {
             $this->database->exec("
                 insert into \"{$this->schema}\".deployed values (
                        {$this->database->quote($change_name)}
                      , current_timestamp
-                     , {$this->database->quote($dependencies)}
+                     , {$dependencies}
                      , {$this->database->quote($deploy)}
                      , {$this->database->quote($verify)}
-                     , {$this->database->quote($revert)});");
-            $this->database->exec("
-                insert into \"{$this->schema}\".deployed_after
-                    select {$this->database->quote($change_name)} as change
-                         , change as after
-                    from \"{$this->schema}\".deployed;");}
+                     , {$this->database->quote($revert)});");}
         catch (\PDOException $error) {
             throw new exception\FailureToMarkChange(
                 "Could not track change {$change_name}",
@@ -283,14 +284,10 @@ class Database {
                 create table \"{$this->schema}\".deployed (
                     change text
                   , deployed_at timestamptz
-                  , dependencies jsonb
+                  , dependencies text[]
                   , deploy text
                   , verify text
-                  , revert text);");
-            $this->database->exec("
-                create table \"{$this->schema}\".deployed_after (
-                    change text
-                  , after text);");});}
+                  , revert text);");});}
 
     
     private $database;
