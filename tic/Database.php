@@ -186,19 +186,23 @@ class Database {
                 $error->getCode(), $error);}}
 
 
-    private function mark_deployed($change_name, $dependencies,
-                                   $deploy, $verify, $revert) {
+    private function mark_deployed(string $change_name,
+                                   array $dependencies,
+                                   string $deploy,
+                                   string $verify,
+                                   string $revert) {
         /*
          * Mark the given change deployed in the database
          */
-        $dependencies = '{'
+        $dependencies = 'array['
             . implode(
                 ',',
                 array_map(
-                    function ($dependency) {
-                        return "\"{$dependency}\""; },
+                    // function ($dependency) {
+                    //     return $this->database->quote($dependency); }
+                    [$this->database, 'quote'],
                     $dependencies))
-            . '}';
+            . ']::text[]';
 
         try {
             $this->database->exec("
