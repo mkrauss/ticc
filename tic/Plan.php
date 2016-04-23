@@ -15,6 +15,24 @@ class Plan {
             function ($change) { return $change->dependencies(); });}
 
 
+    public function minus(Plan $other) {
+        /*
+         * Return a new plan representing the Changes in this plan
+         * which do not appear, by name, in $other.
+         */
+        $result = clone($this);
+
+        $result->plan = F\reject(
+            $this->plan,
+            function (Change $change) use ($other) {
+                return F\some(
+                    $other->plan,
+                    function (Change $otherchange) use ($change) {
+                        return $change->name() === $otherchange->name();});});
+
+        return $result;}
+
+
     public function subplan($deployed_change_names, $target_change_name=null) {
         /*
          * Returns a new Plan representing the necessary changes to
