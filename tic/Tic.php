@@ -70,6 +70,8 @@ class Tic {
          * Main entry point - switches control based on command
          */
 
+        // var_export($this->masterplan->minus($this->deployedplan)); die(PHP_EOL);
+
         switch ($this->command) {
             case 'overview': $this->run_overview(); break;
             case 'deploy': $this->run_deploy(); break;
@@ -95,14 +97,21 @@ class Tic {
          * dependencies of it, or all un-deployed changes.
          */
         $this->database->with_protection(function() {
-            $this->intended_plan()->inject_changes_to(
-                function ($change_name, $plan, $deploy, $verify, $revert) {
-                    echo "Deploying: {$change_name}... ";
-                    if (is_null($deploy))
-                        echo "Nothing to deploy.\n";
-                    else {
-                        $this->database->deploy_change($change_name, $plan, $deploy, $verify, $revert);
-                        echo " Done.\n";}});});}
+            $this->masterplan
+                ->minus($this->deployedplan)
+                ->inject_changes_to(
+                    function ($change_name, $plan, $deploy, $verify, $revert) {
+                        echo "Deploying: {$change_name}... ";
+                        if (is_null($deploy))
+                            echo "Nothing to deploy.\n";
+                        else {
+                            $this->database->deploy_change(
+                                $change_name,
+                                $plan,
+                                $deploy,
+                                $verify,
+                                $revert);
+                            echo " Done.\n";}});});}
 
 
     private function run_revert() {
