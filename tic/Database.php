@@ -135,7 +135,7 @@ class Database {
                     $verify, new exception\ChangeDeploymentError(
                         "Change {$change_name} failed to re-verify"));
 
-                $this->mark_deployed($change_name, json_encode($dependencies),
+                $this->mark_deployed($change_name, $dependencies,
                                      $deploy, $verify, $revert);});}
 
 
