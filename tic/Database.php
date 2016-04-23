@@ -87,9 +87,17 @@ class Database {
         /*
          * Fetch and return an array of currently deployed changes
          */
-        return $this->database->query("
-            select change from \"{$this->schema}\".deployed;")
-            ->fetchAll(\PDO::FETCH_COLUMN, 0);}
+
+        return array_map(
+            function ($change) {
+                if (empty($change['deploy'])) unset($change['deploy']);
+                if (empty($change['verify'])) unset($change['verify']);
+                if (empty($change['revert'])) unset($change['revert']);
+                return Change($change); },
+            $this->database->query("
+                select change, dependencies, deploy, verify, revert
+                from \"{$this->schema}\".deployed;")
+            ->fetchAll(\PDO::FETCH_COLUMN, 0));}
 
 
     public function deploy_change($change_name, $dependencies, $deploy, $verify, $revert) {
