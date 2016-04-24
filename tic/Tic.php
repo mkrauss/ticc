@@ -100,7 +100,11 @@ class Tic {
             $this->masterplan
                 ->minus($this->deployedplan)
                 ->inject_changes_to(
-                    function ($change_name, $plan, $deploy, $verify, $revert) {
+                    function (string $change_name,
+                              array $dependencies,
+                              string $deploy=null,
+                              string $verify=null,
+                              string $revert=null) {
                         echo "Deploying: {$change_name}... ";
                         if (is_null($deploy))
                             echo "Nothing to deploy.\n";
