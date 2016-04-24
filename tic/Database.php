@@ -190,16 +190,15 @@ class Database {
                                          $to_revert['revert']);});}
 
 
-    private function revert_change($change_name, $revert) {
+    public function revert_change(string $revert) {
         /*
          * Revert a single change $change_name with script $revert
          */
         $this->database->exec($revert);
-        $this->unmark_deployed($change_name);
     }
 
 
-    private function unmark_deployed($change_name) {
+    public function unmark_deployed($change_name) {
         /*
          * Remove the deployment info for the given chnage 
          */
