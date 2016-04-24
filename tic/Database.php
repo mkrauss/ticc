@@ -163,10 +163,7 @@ class Database {
 
                 $this->exec_to_rollback(
                     $verify, new exception\ChangeDeploymentError(
-                        "Change {$change_name} failed to re-verify"));
-
-                $this->mark_deployed($change_name, $dependencies,
-                                     $deploy, $verify, $revert);});}
+                        "Change {$change_name} failed to re-verify"));});}
 
 
     public function revert_through($change_name) {

@@ -111,11 +111,16 @@ class Tic {
                         else {
                             $this->database->deploy_change(
                                 $change_name,
-                                $plan,
+                                $dependencies,
                                 $deploy,
                                 $verify,
                                 $revert);
-                            echo " Done.\n";}});});}
+                            echo " Done.\n";}
+                        $this->database->mark_deployed($change_name,
+                                                       $dependencies,
+                                                       $deploy,
+                                                       $verify,
+                                                       $revert);});});}
 
 
     private function run_revert() {
