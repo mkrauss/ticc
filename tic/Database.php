@@ -93,6 +93,7 @@ class Database {
 
         return array_map(
             function ($change) {
+                $change['dependencies'] = static::translate_array_from_pg($change['dependencies']);
                 if (empty($change['deploy'])) unset($change['deploy']);
                 if (empty($change['verify'])) unset($change['verify']);
                 if (empty($change['revert'])) unset($change['revert']);
@@ -101,6 +102,23 @@ class Database {
                 select change, dependencies, deploy, verify, revert
                 from \"{$this->schema}\".deployed;")
             ->fetchAll(\PDO::FETCH_COLUMN, 0));}
+
+    static private function translate_array_from_pg(string $array_rep) {
+        /*
+         * Given a string (?!) result from a PostgreSQL array,
+         * translate it to a PHP array. Because PDO sucks. Need to
+         * consider another DB layer.
+         *
+         * Note: this is *not* a complete or robust method, but should
+         * cover the anticipated cases for this program.
+         */
+        return $array_rep === '{}'
+            ? []
+            : array_map(
+                function($element) { return $element === '""' ? '' : $element; },
+                explode(
+                    ',',
+                    trim($array_rep, '{}')));}
 
 
     public function deploy_change($change_name, $dependencies, $deploy, $verify, $revert) {
