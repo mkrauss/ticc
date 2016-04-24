@@ -20,9 +20,9 @@ class Change {
             && isset($change_plan['revert_script'])
             && isset($change_plan['verify_script'])) {
 
-            $this->deploy_script = F\pick($change_plan, 'deploy_script', '');
-            $this->revert_script = F\pick($change_plan, 'revert_script', '');
-            $this->verify_script = F\pick($change_plan, 'verify_script', '');}
+            $this->deploy_script = F\pick($change_plan, 'deploy_script');
+            $this->revert_script = F\pick($change_plan, 'revert_script');
+            $this->verify_script = F\pick($change_plan, 'verify_script');}
 
         elseif (isset($change_plan['deploy_script'])
                 || isset($change_plan['revert_script'])
@@ -71,7 +71,7 @@ class Change {
 
     private $name;
     private $dependencies;
-    private $deploy_script;
-    private $revert_script;
-    private $verify_script;
+    private $deploy_script = null;
+    private $revert_script = null;
+    private $verify_script = null;
 }
