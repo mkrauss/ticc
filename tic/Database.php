@@ -99,9 +99,13 @@ class Database {
                 if (empty($change['revert'])) unset($change['revert']);
                 return new Change($change); },
             $this->database->query("
-                select change, dependencies, deploy, verify, revert
+                select change as change_name
+                     , dependencies as dependencies
+                     , deploy as deploy_script
+                     , verify as verify_script
+                     , revert as revert_script
                 from \"{$this->schema}\".deployed;")
-            ->fetchAll(\PDO::FETCH_COLUMN, 0));}
+            ->fetchAll());}
 
     static private function translate_array_from_pg(string $array_rep) {
         /*
