@@ -33,6 +33,16 @@ class Plan {
         return $result;}
 
 
+    public function reverse() {
+        /*
+         * Return a new plan representing the reverse of this one.
+         */
+        $result = clone($this);
+        $result->plan = array_reverse($result->plan);
+        return $result;
+    }
+
+
     public function subplan($deployed_change_names, $target_change_name=null) {
         /*
          * Returns a new Plan representing the necessary changes to
