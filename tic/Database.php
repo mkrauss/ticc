@@ -92,7 +92,7 @@ class Database {
          */
 
         return array_map(
-            function ($change) {
+            function (array $change) {
                 $change['dependencies'] = static::translate_array_from_pg($change['dependencies']);
                 if (empty($change['deploy'])) unset($change['deploy']);
                 if (empty($change['verify'])) unset($change['verify']);
@@ -121,7 +121,12 @@ class Database {
                     trim($array_rep, '{}')));}
 
 
-    public function deploy_change($change_name, $dependencies, $deploy, $verify, $revert) {
+
+    public function deploy_change(string $change_name,
+                                  array $dependencies,
+                                  string $deploy=null,
+                                  string $verify=null,
+                                  string $revert=null) {
         /*
          * Deploy a change, making sure it is complete, and mark it deployed
          */
@@ -207,11 +212,11 @@ class Database {
                 $error->getCode(), $error);}}
 
 
-    private function mark_deployed(string $change_name,
-                                   array $dependencies,
-                                   string $deploy,
-                                   string $verify,
-                                   string $revert) {
+    public function mark_deployed(string $change_name,
+                                  array $dependencies,
+                                  string $deploy=null,
+                                  string $verify=null,
+                                  string $revert=null) {
         /*
          * Mark the given change deployed in the database
          */
