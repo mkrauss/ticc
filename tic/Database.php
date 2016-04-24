@@ -329,9 +329,9 @@ class Database {
 
             $this->database->exec("
                 create table \"{$this->schema}\".deployed (
-                    change text
-                  , deployed_at timestamptz
-                  , dependencies text[]
+                    change text primary key
+                  , deployed_at timestamptz not null
+                  , dependencies text[] not null
                   , deploy text
                   , verify text
                   , revert text);");});}
