@@ -233,16 +233,25 @@ class Database {
         try {
             $this->database->exec("
                 insert into \"{$this->schema}\".deployed values (
-                       {$this->database->quote($change_name)}
+                       {$this->quote($change_name)}
                      , current_timestamp
                      , {$dependencies}
-                     , {$this->database->quote($deploy)}
-                     , {$this->database->quote($verify)}
-                     , {$this->database->quote($revert)});");}
+                     , {$this->quote($deploy)}
+                     , {$this->quote($verify)}
+                     , {$this->quote($revert)});");}
         catch (\PDOException $error) {
             throw new exception\FailureToMarkChange(
                 "Could not track change {$change_name}",
                 $error->getCode(), $error);}}
+
+
+    private function quote(string $value=null) {
+        /*
+         * Quote respecing NULLs because PDO sucks.
+         */
+        return is_null($value) ? 'NULL' : $this->database->quote($value);
+    }
+
 
 
     public function exec($statement, $exception = null) {
