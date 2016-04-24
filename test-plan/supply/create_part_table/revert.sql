@@ -1,3 +1,3 @@
 set search_path="supply";
 
-drop table "parts";
+drop table "part";

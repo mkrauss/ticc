@@ -1,6 +1,6 @@
 set search_path="supply";
 
-create table "parts" (
+create table "part" (
   primary key ("supplier", "part_code")
 
   , "supplier" text

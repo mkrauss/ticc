@@ -1,3 +1,3 @@
 set search_path="supply";
 
-select * from "parts";
+select * from "part";
