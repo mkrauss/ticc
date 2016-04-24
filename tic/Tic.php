@@ -76,6 +76,7 @@ class Tic {
             case 'overview': $this->run_overview(); break;
             case 'deploy': $this->run_deploy(); break;
             case 'revert': $this->run_revert(); break;
+            case 'sync': $this->run_sync(); break;
             case 'redeploy': $this->run_redeploy(); break;
             default: throw new exception\BadCommandException(
                 'Must give valid command');}}
@@ -111,6 +112,27 @@ class Tic {
         $this->database->with_protection(function() {
             $this->revert_plan(
                 $this->deployedplan->reverse());});}
+
+
+    private function run_sync() {
+        /*
+         * Revert changes which are different or removed in the
+         * current deployed plan; then deploy all undeployed changes
+         * from the master plan.
+         */
+        $this->database->with_protection(function() {
+
+            $stale_plan = $this->deployedplan
+                ->different_from($this->masterplan);
+
+            $this->revert_plan($stale_plan->reverse());
+
+            echo PHP_EOL;
+
+            $this->deploy_plan(
+                $this->masterplan
+                ->minus($this->deployedplan
+                        ->minus($stale_plan)));});}
 
 
     private function deploy_plan($plan) {

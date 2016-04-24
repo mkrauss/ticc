@@ -57,6 +57,24 @@ class Change {
                 return $dependency === $change_name;});}
 
 
+    public function equivalent_to(Change $other) {
+        /*
+         * True if this change and $other are exactly equivalent -
+         * same name and all scripts unchanged. Ignores changes in
+         * dependencies as those represent "where the change fits"
+         * rather than "what the change is"; or more materially,
+         * because this is used to determine when a change needs to be
+         * reverted for syncing, and if it is already deployed
+         * successfully, a different dependencies do not indicate
+         * re-deploying.
+         */
+        return $this->name === $other->name
+            && $this->deploy_script === $other->deploy_script
+            && $this->verify_script === $other->verify_script
+            && $this->revert_script === $other->revert_script;
+    }
+
+
     public function inject_to($fn) {
         /*
          * Call $fn passing it: $change_name, $change_plan, $deploy,

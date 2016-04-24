@@ -39,8 +39,39 @@ class Plan {
          */
         $result = clone($this);
         $result->plan = array_reverse($result->plan);
-        return $result;
-    }
+        return $result;}
+
+
+    public function different_from(Plan $other) {
+        /*
+         * Return a new plan representing the Changes in this plan
+         * which are either missing (by name) or changed (by scripts)
+         * in $other, as well as any changes in this plan which depend
+         * on those.
+         *
+         * Two Hard Things. This function name is unclear.
+         */
+        $result = clone($this);
+        $included_names = [];
+
+        $result->plan = F\select(
+            $this->plan,
+            function (Change $change) use ($other, &$included_names) {
+                $include
+                    = F\some(
+                        $included_names,
+                        function (string $included_name) use ($change) {
+                            return $change->depends_on($included_name);})
+                    || F\none(
+                        $other->plan,
+                        function (Change $otherchange) use ($change) {
+                            return $change->equivalent_to($otherchange);});
+
+                if ($include) array_push($included_names, $change->name());
+
+                return $include;});
+
+        return $result;}
 
 
     public function subplan($deployed_change_names, $target_change_name=null) {
