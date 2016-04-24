@@ -128,12 +128,23 @@ class Tic {
          * Revert all changes made back to and including the one
          * specified in the command
          */
-        if (empty($this->args))
-            throw new exception\BadCommandException(
-                'Must give change to revert');
+        // var_export($this->deployedplan->reverse()); die(PHP_EOL);
         $this->database->with_protection(function() {
-            $this->database->revert_through(
-                array_shift($this->args));});}
+            $this->deployedplan
+                ->reverse()
+                ->inject_changes_to(
+                    function (string $change_name,
+                              array $dependencies,
+                              string $deploy=null,
+                              string $verify=null,
+                              string $revert=null) {
+                        echo "Reverting: {$change_name}...";
+                        if (is_null($revert))
+                            echo "Nothing to revert.\n";
+                        else {
+                            $this->database->revert_change($revert);
+                            echo " Done.\n";}
+                        $this->database->unmark_deployed($change_name);});});}
 
 
     private function load_plans($plan_dir) {
