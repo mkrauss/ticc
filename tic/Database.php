@@ -97,7 +97,7 @@ class Database {
                 if (empty($change['deploy'])) unset($change['deploy']);
                 if (empty($change['verify'])) unset($change['verify']);
                 if (empty($change['revert'])) unset($change['revert']);
-                return Change($change); },
+                return new Change($change); },
             $this->database->query("
                 select change, dependencies, deploy, verify, revert
                 from \"{$this->schema}\".deployed;")
