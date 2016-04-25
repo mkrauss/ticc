@@ -1,0 +1,227 @@
+
+TICC - Transactional Iterative Change Control
+
+(Or: ITCH - Iterative Transaction CHanges?)
+
+* Overview
+
+Ticc is a system for iteratively managing changes to a database.
+
+Ticc currently only works with PostgreSQL, and by design requires a
+database management system that supports transactional DDL. Ticc may
+work with other database management systems in the future. If you are
+interested in adding support for other back-ends, that would be great!
+
+** Why should you care?
+
+You might be interested in this if you design databases, especially
+with PostgreSQL. You may be interested in adapting it to whatever DBMS
+you are using.
+
+SQL is, in many ways, a terrible language, but it is the native
+language of most modern DBMSs. Most migrations systems go through an
+ORM that severely limits what you can do. Even if you are *accessing*
+your data through an ORM, if you want to set up a powerful database
+with more advanced features like views, rules, and triggers, if you
+are trying in any way to design a quality database, you should want to
+use the native DDL of your preferred DBMS.
+
+This tool simply makes it easier to do so.
+
+I would love to see more DMBSs supported in the future (and not
+necessarily just SQL either), but for now, this is a PostgreSQL tool.
+
+** Comparison between Sqitch and Ticc
+
+Ticc is directly inspired by a similar project called [[http://sqitch.org/][Sqitch]]. Sqitch
+is an awesome project and you should definitely check it out, too. I
+will try to give some guidance in deciding which is right for you, but
+I would recommend everybody doing SQL architecture use one or the
+other.
+
+Like Sqitch, Ticc is an attempt to take the pain out of iterative data
+architecture, by giving you a framework to track a collection of
+changes and deploy or revert them as needed. Both projects focus on
+using the native DDL of your database, both are intended to work well
+with version control software like Git, and both are simple command
+line tools.
+
+*** Advantages to Sqitch
+
+I am biased - I wrote Ticc and think it's the way to go - but Sqitch
+is still great and there are definitely reasons some may use Sqitch.
+
+The largest advantage to Sqitch as I see it is support for other
+back-ends. Ticc currently only supports PostgreSQL and due to feature
+differences, can *never* support as many back-end DBMSs as Sqitch.
+Sqitch can support DBMSs that do not have transactional DDL, or that
+do not have nested transactions or save-points; Ticc depends on those
+features.
+
+Some may also prefer the Sqitch approach, with explicitly written
+transactions inside your change files.
+
+If anybody has more reasons they love Sqitch, please share!
+
+*** Advantages to Ticc
+
+Ticc manages transactions for you, and protects entire actions. This
+means that every time you issue a Ticc command, you can be sure it
+will either complete correctly, or fail and leave the database as it
+was, with no need to clean up.
+
+Ticc ensures that every change is not only deployable, but verifiable
+and revertable, before committing it's deployment. This means that you
+can work safely and not worry about breaking the synchronization of
+the Ticc plan and the actual database.
+
+Ticc uses a previously tested script to revert each change when
+needed, so a bad revert script will never leave you with a change that
+cannot be reverted.
+
+Ticc offers a single command, =ticc sync=, that will do the right
+thing nearly all the time. It reverts any changes that are necessary
+based on your modifications to the master plan, and then deploys
+everything to make your deployed database match the plan.
+
+* Usage
+
+Ticc works by constructing a master plan from a collection of DDL
+change files and plan fragments. The first thing you need is a project
+directory to keep your plan in. It is best to keep this in a source
+control repository like Git.
+
+Every directory - the top level project directory and every directory
+under it - is considered to represent a "change", although they need
+not all actually change something in your database.
+
+** Change dependencies
+
+You may nest changes under other changes. Change attributes, such as
+dependencies, are inherited by the changes beneath it, and every
+change implicitly depends on all the changes beneath it. Suppose that
+if you have:
+
+- =Change A=
+  - =Change A1=
+- =Change B= (explicitly depends on =Change A=)
+  - =Change B1=
+
+=Change B1= will inherit the explicit dependency, so it also depends
+on =Change A=. =Change A= implicitly depends on =Change A1=. =Change
+B= implicitly depends on =Change B1=. Therefore, these *must* be
+performed in the following order:
+
+- =Change A1=
+- =Change A=
+- =Change B1=
+- =Change B=
+
+You may find it useful to group changes with similar dependencies
+under a common directory where those can be defined.
+
+** Configuration
+
+The config file defaults to tic.json in the root of your plan.
+
+Currently there is a single top level configuration key, =database=,
+which can contain sub-keys to configure the database Ticc should
+connect to.
+
+- =database= :: Configure the database connection
+
+  - =engine= :: The PHP PDO engine to connect with. The default and
+       only supported option is =pgsql=. You can try other PDO
+       engines if you like, but no handling for other engines has been
+       added, so I have no idea what it would do.
+
+  - =host= :: The database host to connect to. Defaults to no host,
+       which with the pgsql engine will connect to a local PostgreSQL
+       over a socket.
+
+  - =port= :: The database port
+
+  - =name= :: The name of the database
+
+  - =ticc schema= :: The schema for Tic to keep it's own data in.
+       Defaults to =ticc=, which should be fine, if it doesn't
+       conflict with something else.
+
+If you are using PostgreSQL running on your local machine, you
+probably only need something like:
+
+#+begin_src javascript
+  {
+      "database": {
+          "name": "my_database"
+      }
+  }
+#+end_src
+
+** Plan structure
+
+Rationale: Dependencies should be defined close to the sql files they
+describe. When looking at any directory, we should not see multiple
+items representing the same thing, such as a plan file and a directory
+it describes.
+
+Each directory in the plan represents a /change/. Each /change/ may
+optionally contain any of:
+
+- A =plan.json= file providing attributes for this change (and
+  possibly /sub-changes/)
+
+- A set of scripts describing how to deploy this /change/. If any are
+  present, they all must be:
+  - =deploy.sql= :: DDL to deploy the /change/
+  - =verify.sql= :: A statement which will only succeed if the /change/
+       was successfully deployed, such as selecting from a created
+       table
+  - =revert.sql= :: DDL to revert the /change/
+
+- One or more directories representing /changes/ that should inherit
+  attributes from this one.
+
+** Commands
+
+*** ticc deploy
+
+Deploy the master plan (the one represented by your plan directories).
+Does not re-deploy any already deployed changes (by name, even if they
+are different from the version deployed).
+
+*** ticc revert
+
+Revert all deployed changes.
+
+*** ticc sync
+
+Revert any changes that are in name or script different from the
+master plan, as well as any changes which depend directly or
+indirectly on those; then deploy all undeployed changes. This should
+sync your deployed database up with the master plan, and is usually
+the only command you should need.
+
+* Obsolete
+
+** How to get changes from git
+
+This may not be necessary, as I am looking at a way to look at changed
+files based on what was deployed versus what is on disk directly,
+which would be better...
+
+We can get the current commit HEAD hash with =rev-parse= and store
+that when we deploy changes. We can then use =diff= to get the changes
+between the last deployed and current versions, and pipe through
+dirname and uniq to find the directories containing changes. Then
+revert all modified changes and re-deploy!
+
+#+begin_src sh
+  git rev-parse HEAD # Get the current commit
+
+  git diff --name-only \
+      fc6bb87f9fe3b9ba735f6c37978ea5a96c848d29 \
+      0254d85a99e4cac63efa8db8fca21de89c01654e \
+      | xargs -L1 dirname \
+      | uniq
+#+end_src
