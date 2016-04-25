@@ -280,9 +280,8 @@ class Database {
         try {
             $this->with_protection(function () use ($statement) {
                 return $this->database->exec($statement);});
-            if (isset($exception)) {
-                $exception->add_reason($error->getMessage());
-                throw $exception; }
+            if (isset($exception))
+                throw $exception;
             else
                 throw new Exception(
                     'A statement intended to fail succeeded');}
