@@ -202,6 +202,36 @@ indirectly on those; then deploy all undeployed changes. This should
 sync your deployed database up with the master plan, and is usually
 the only command you should need.
 
+* Justifications
+
+** Why PHP?
+
+I know a lot of languages. I am often tinkering around in Lisp.
+However, PHP is the language I know best, simply because people keep
+insisting on paying me to write stuff in it. I considered node.js for
+this as it's what I'm learning right now, but I had a practical and
+immediate need for Ticc, so I decided to do it in PHP as I could get
+it working fastest that way. I am still considering rewriting it in a
+different language.
+
+** What's this weird code style?
+
+I have followed quite a number of code style guides in different
+places I've worked. I have my own opinions on what makes good style,
+and they are all based on practical experience and reasons. Since this
+is a personal project and, again, I wanted to get it running quickly,
+I've used my own style. I may add a style guide to this project
+explaining the actual reasons, but in the mean time, give it a try -
+if you get used to it, I bet you will prefer it.
+
+** Why aren't there interfaces? Dependency injection? Unit tests?
+
+There isn't a great reason here. Mostly I was just rushing to get this
+to the point where it would be useful to me, developing as a single
+coder rather than on a team, and it's a small project that is pretty
+manageable as-is. However, I would welcome pull requests improving all
+these things.
+
 * Obsolete
 
 ** How to get changes from git
