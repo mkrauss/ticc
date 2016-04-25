@@ -1,6 +1,6 @@
 <?php
 
-namespace tic\exception;
+namespace ticc\exception;
 
 class ChangeDeploymentError extends \Exception{
     public function add_reason($reason) {

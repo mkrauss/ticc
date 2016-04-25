@@ -1,6 +1,6 @@
 <?php
 
-namespace tic;
+namespace ticc;
 
 use Functional as F;
 

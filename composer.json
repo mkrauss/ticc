@@ -1,5 +1,5 @@
 {
-    "name": "mkrauss/tic",
+    "name": "mkrauss/ticc",
     "description": "Transactional Iterative Changes",
     "authors": [
         {
@@ -10,7 +10,7 @@
 
     "autoload": {
         "psr-4": {
-            "tic\\": "tic/"
+            "ticc\\": "ticc/"
         },
         "files": ["functions/topological_sort.php"]
     },

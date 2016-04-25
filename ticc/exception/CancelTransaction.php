@@ -1,6 +1,6 @@
 <?php
 
-namespace tic\exception;
+namespace ticc\exception;
 
 /*
  *This is an atypical exception intended to be thrown and caught

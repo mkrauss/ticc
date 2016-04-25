@@ -1,5 +1,5 @@
 <?php
 
-namespace tic\exception;
+namespace ticc\exception;
 
 class NoDatabaseException extends \Exception{};

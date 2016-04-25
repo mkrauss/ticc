@@ -1,10 +1,10 @@
 <?php
 
-namespace tic;
+namespace ticc;
 
 use Functional as F;
 
-class Tic {
+class Ticc {
     public function __construct($argv) {
         /*
          * Initialize application
@@ -51,7 +51,7 @@ class Tic {
         
         $this->config = json_decode(
             file_get_contents(
-                F\pick($this->params, 'config file', 'tic.json')), true);}
+                F\pick($this->params, 'config file', 'ticc.json')), true);}
 
 
     private function connect_db() {

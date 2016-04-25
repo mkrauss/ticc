@@ -1,13 +1,13 @@
 <?php
 
-namespace tic;
+namespace ticc;
 
 use Functional as F;
 
 class Database {
     public function __construct($config) {
         /*
-         * Connect to the database and ensure it is set up for Tic
+         * Connect to the database and ensure it is set up for Ticc
          */
 
         $this->in_transaction = false;
@@ -314,7 +314,7 @@ class Database {
 
     private function ensure_tic() {
         /*
-         * Makes sure there is a proper tic schema and initializes it
+         * Makes sure there is a proper ticc schema and initializes it
          * if not
          */
         $this->with_transaction(function () {

@@ -122,7 +122,7 @@ under a common directory where those can be defined.
 
 ** Configuration
 
-The config file defaults to tic.json in the root of your plan.
+The config file defaults to ticc.json in the root of your plan.
 
 Currently there is a single top level configuration key, =database=,
 which can contain sub-keys to configure the database Ticc should
@@ -143,7 +143,7 @@ connect to.
 
   - =name= :: The name of the database
 
-  - =ticc schema= :: The schema for Tic to keep it's own data in.
+  - =ticc schema= :: The schema for Ticc to keep it's own data in.
        Defaults to =ticc=, which should be fine, if it doesn't
        conflict with something else.
 

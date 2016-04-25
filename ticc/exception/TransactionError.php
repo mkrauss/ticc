@@ -1,5 +1,5 @@
 <?php
 
-namespace tic\exception;
+namespace ticc\exception;
 
 class TransactionError extends \Exception{};
