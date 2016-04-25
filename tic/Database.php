@@ -13,7 +13,7 @@ class Database {
         $this->in_transaction = false;
         $this->savepoint_count = 0;
 
-        $this->schema = $config['tic schema'] ?? 'tic';
+        $this->schema = $config['ticc schema'] ?? 'ticc';
 
         $this->database = new \PDO (
             (isset($config['engine']) ? "{$config['engine']}:" : 'pgsql:')
