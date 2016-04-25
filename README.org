@@ -58,8 +58,11 @@ Sqitch can support DBMSs that do not have transactional DDL, or that
 do not have nested transactions or save-points; Ticc depends on those
 features.
 
-Some may also prefer the Sqitch approach, with explicitly written
-transactions inside your change files.
+Some may also prefer the Sqitch approach. Sqitch has explicitly
+written transactions inside change files, and follows a single clear
+linear plan file which you can edit yourself, deciding *exactly* how
+your plan will deploy, rather than letting the tool figure it out for
+you.
 
 If anybody has more reasons they love Sqitch, please share!
 
