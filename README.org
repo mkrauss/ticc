@@ -235,26 +235,3 @@ coder rather than on a team, and it's a small project that is pretty
 manageable as-is. However, I would welcome pull requests improving all
 these things.
 
-* Obsolete
-
-** How to get changes from git
-
-This may not be necessary, as I am looking at a way to look at changed
-files based on what was deployed versus what is on disk directly,
-which would be better...
-
-We can get the current commit HEAD hash with =rev-parse= and store
-that when we deploy changes. We can then use =diff= to get the changes
-between the last deployed and current versions, and pipe through
-dirname and uniq to find the directories containing changes. Then
-revert all modified changes and re-deploy!
-
-#+begin_src sh
-  git rev-parse HEAD # Get the current commit
-
-  git diff --name-only \
-      fc6bb87f9fe3b9ba735f6c37978ea5a96c848d29 \
-      0254d85a99e4cac63efa8db8fca21de89c01654e \
-      | xargs -L1 dirname \
-      | uniq
-#+end_src
