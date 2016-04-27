@@ -177,6 +177,7 @@ class Plan {
         /*
          * Get all plan files under $change_dirname
          */
+
         $change_plan = [
             'change_name' => trim($change_dirname, '/'),
             'dependencies' => $implicit_dependencies];

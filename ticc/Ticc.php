@@ -106,7 +106,7 @@ class Ticc {
             case 'sync': $this->run_sync(); break;
             case 'redeploy': $this->run_redeploy(); break;
             default: throw new exception\BadCommandException(
-                'Must give valid command');}}
+                'Must give valid command: [overview|deploy|revert|sync|redeploy]', 0x0c);}}
 
 
     private function run_overview() {
