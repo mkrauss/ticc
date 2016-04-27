@@ -16,7 +16,8 @@
     },
 
     "require": {
-        "lstrojny/functional-php": "~1.2",
+        "php": ">=5.5",
+        "lstrojny/functional-php": "~1.0",
         "alexkazik/getopts": "1.0.0"
     },
 
