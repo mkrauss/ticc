@@ -41,6 +41,8 @@ EOT;
     (new \ticc\Ticc ($argv))->run();
 } catch (\Exception $e) {
     // On exception, print to STDERR and leave with the thrown error code
+    // Error codes:
+    // 0x0f - Config file not found
     $stderr = fopen('php://stderr', 'rw');
     fputs($stderr, 'FATAL ERROR:' . PHP_EOL);
     fputs($stderr, substr($e->getMessage(), 0, 1022) . PHP_EOL . PHP_EOL, 1024);
