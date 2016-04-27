@@ -48,7 +48,13 @@ class Ticc {
         /*
          * Load the configuration file
          */
-        
+        if (!file_exists(F\pick($this->params, 'config file', 'ticc.json'))) {
+            throw new \Exception(
+                'Please copy ticc.sample.json to ticc.json and customize as directed in the README.',
+                0x0f
+            );
+        }
+
         $this->config = json_decode(
             file_get_contents(
                 F\pick($this->params, 'config file', 'ticc.json')), true);}
