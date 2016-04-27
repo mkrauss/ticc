@@ -27,6 +27,11 @@ require_once __DIR__ . '/vendor/alexkazik/getopts/getopts.php';
 
 try {
     echo <<<EOT
+ _____ ___ ___ ___
+|_   _|_ _/ __/ __|
+  | |  | | (_| (__
+  |_| |___\___\___|
+
 Transactional Iterative Changes - Copyright (C) 2016 Matthew Krauss
 
 This program comes with ABSOLUTELY NO WARRANTY; for details type `$argv[0] license -w'.
