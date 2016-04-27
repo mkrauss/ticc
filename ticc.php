@@ -43,10 +43,12 @@ EOT;
     // On exception, print to STDERR and leave with the thrown error code
     // Error codes:
     // 0x0f - Config file not found
+    // 0xff - Undefined error code
     $stderr = fopen('php://stderr', 'rw');
     fputs($stderr, 'FATAL ERROR:' . PHP_EOL);
     fputs($stderr, substr($e->getMessage(), 0, 1022) . PHP_EOL . PHP_EOL, 1024);
     fclose($stderr);
 
-    exit($e->getCode());
+    $code = $e->getCode() > 0 ? $e->getCode() : 0xff;
+    exit($code);
 }
