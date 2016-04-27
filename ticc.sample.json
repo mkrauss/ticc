@@ -1,0 +1,7 @@
+{
+    "database": {
+        "name": "my_database"
+    },
+
+    "plan_directory": "test-plan"
+}

@@ -235,3 +235,7 @@ coder rather than on a team, and it's a small project that is pretty
 manageable as-is. However, I would welcome pull requests improving all
 these things.
 
+* Requirements
+
+- At least PHP7
+- A Postgres server (version to come)

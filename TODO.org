@@ -1,0 +1,1 @@
+* TODO Add 'license' option for displaying more of GPL license
