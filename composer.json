@@ -1,11 +1,13 @@
 {
     "name": "mkrauss/ticc",
+    "license": "GPLv3",
+    "type": "project",
     "description": "Transactional Iterative Changes",
     "authors": [
         {
             "name": "Matthew Krauss",
             "email": "mkrauss@nabancard.com"
-        }
+        },
     ],
 
     "autoload": {
@@ -16,6 +18,7 @@
     },
 
     "require": {
+        "php": ">=7.0",
         "lstrojny/functional-php": "~1.2",
         "alexkazik/getopts": "1.0.0"
     },
