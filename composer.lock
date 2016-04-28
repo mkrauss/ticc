@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "81807ab9cd6e43de951264ec780c5618",
-    "content-hash": "55422155d3f34698dce46152972c7f78",
+    "hash": "a7e4ed4fcee1319a505059faad5f520d",
+    "content-hash": "4aa41968c303c8f214b30552208b9e68",
     "packages": [
         {
             "name": "alexkazik/getopts",
@@ -19,28 +19,28 @@
         },
         {
             "name": "lstrojny/functional-php",
-            "version": "1.0.0",
+            "version": "1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/lstrojny/functional-php.git",
-                "reference": "dffae98dd0873aeab168246792fc0501735ef971"
+                "reference": "36506d28c29fcfdc260c2341e251ea8834f8d8ed"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/lstrojny/functional-php/zipball/dffae98dd0873aeab168246792fc0501735ef971",
-                "reference": "dffae98dd0873aeab168246792fc0501735ef971",
+                "url": "https://api.github.com/repos/lstrojny/functional-php/zipball/36506d28c29fcfdc260c2341e251ea8834f8d8ed",
+                "reference": "36506d28c29fcfdc260c2341e251ea8834f8d8ed",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.0"
+                "php": ">=5.6.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "~4"
+                "phpunit/phpunit": "~5"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.0-dev"
+                    "dev-master": "1.2-dev"
                 }
             },
             "autoload": {
@@ -67,7 +67,7 @@
             "keywords": [
                 "functional"
             ],
-            "time": "2015-06-23 21:56:56"
+            "time": "2015-12-03 08:26:11"
         }
     ],
     "packages-dev": [],
@@ -77,7 +77,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=5.5"
+        "php": ">=7.0"
     },
     "platform-dev": []
 }
