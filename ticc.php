@@ -44,7 +44,8 @@ under certain conditions; type `$argv[0] license -c' for details.
 
 EOT;
     (new \ticc\Ticc ($argv))->run();
-} catch (\Exception $e) {
+}
+catch (\Exception $e) {
     // On exception, print to STDERR and leave with the thrown error code
     // Error codes:
     // 0x0f - Config file not found
@@ -52,7 +53,7 @@ EOT;
     // 0xff - Undefined error code
     $stderr = fopen('php://stderr', 'rw');
     fputs($stderr, 'FATAL ERROR:' . PHP_EOL);
-    fputs($stderr, substr($e->getMessage(), 0, 1022) . PHP_EOL . PHP_EOL, 1024);
+    fputs($stderr, substr($e, 0, 1022) . PHP_EOL . PHP_EOL, 1024);
     fclose($stderr);
 
     $code = $e->getCode() > 0 ? $e->getCode() : 0xff;

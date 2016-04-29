@@ -31,7 +31,7 @@ class ChangeDeploymentError extends \Exception{
         $this->reason = $reason;}
 
     public function __toString() {
-        return __CLASS__ . ": {$this->message} ({$this->reason})\n";}
+        return "{$this->message}\n{$this->reason}\n";}
 
     private $reason;
 };
