@@ -44,7 +44,9 @@ class Ticc {
 
         $this->connect_db();
 
-        $this->load_plans(F\pick($this->config, 'plan_directory', ''));}
+        $this->find_change_dir();
+
+        $this->load_plans();}
 
 
     private function load_parameters($argv) {
@@ -90,6 +92,14 @@ class Ticc {
             throw new exception\NoDatabaseException();
 
         $this->database = new Database($this->config['database']);}
+
+
+    private function find_change_dir() {
+        /*
+         * Configure the master plan change directory
+         */
+        $this->change_directory = new ChangeSource(
+            F\pick($this->config, 'plan_directory', ''));}
 
 
     public function run() {
@@ -209,12 +219,12 @@ class Ticc {
                 $this->database->unmark_deployed($change_name);});}
 
 
-    private function load_plans($plan_dir) {
+    private function load_plans() {
         /*
          * Loads a plan of changes from the given $plan_dir
          */
 
-        $this->masterplan = new Plan(Plan::changes($plan_dir));
+        $this->masterplan = new Plan($this->change_directory->changes());
         $this->deployedplan = new Plan($this->database->deployed_changes());}
 
 
@@ -242,4 +252,5 @@ class Ticc {
     private $database;
     private $masterplan;
     private $deployedplan;
+    private $change_directory;
 }
