@@ -25,3 +25,13 @@ bad dependency.
 
 Another option here is to validate all dependencies before sorting, so
 there is only one possible error when sorting.
+
+* TODO Figure out a way to preserve json source
+
+Would be nice to be able to modify a plan and write back the plan.json
+with just the changed bits modified, leaving original whitespace
+formatting. I remember seeing an enhanced json of some sort that had
+support for comments and other human-centric enhancements, and I think
+it also had this ability...
+
+Another option: give up json and use more strictly defined format(s).
