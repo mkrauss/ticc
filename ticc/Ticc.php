@@ -110,23 +110,12 @@ class Ticc {
         // var_export($this->masterplan->minus($this->deployedplan)); die(PHP_EOL);
 
         switch ($this->command) {
-            case 'overview': $this->run_overview(); break;
             case 'deploy': $this->run_deploy(); break;
             case 'revert': $this->run_revert(); break;
             case 'sync': $this->run_sync(); break;
             case 'redeploy': $this->run_redeploy(); break;
             default: throw new exception\BadCommandException(
-                'Must give valid command: [overview|deploy|revert|sync|redeploy]', 0x0c);}}
-
-
-    private function run_overview() {
-        /*
-         * Display an overview of of the plan that would be executed
-         * with DEPLOY. Takes the same arguments ad DEPLOY.
-         */
-        $this->intended_plan()->inject_changes_to(
-            function ($name, $dependencies, $deploy, $verify, $revert) {
-                echo "{$name}\n";});}
+                'Must give valid command: [deploy|revert|sync|redeploy]', 0x0c);}}
 
 
     private function run_deploy() {
@@ -226,21 +215,6 @@ class Ticc {
 
         $this->masterplan = new Plan($this->change_directory->changes());
         $this->deployedplan = new Plan($this->database->deployed_changes());}
-
-
-    private function intended_plan() {
-        /*
-         * Returns a potential plan based on the command line
-         * parameters
-         */
-        static $plan = null;
-
-        if (is_null($plan))
-            $plan = $this->plan->subplan(
-                $this->database->deployed_changes(),
-                empty($this->args) ? null : array_shift($this->args));
-
-        return $plan;}
 
 
     private $called_as;
