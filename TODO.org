@@ -1,1 +1,27 @@
 * TODO Add 'license' option for displaying more of GPL license
+
+* TODO Import/export option
+
+** TODO Import from Sqitch
+
+** TODO Export to Sqitch
+
+* TODO Command to move a change
+
+* TODO Better error reporting
+
+** TODO Probably want a top level UserError exception
+
+To consistently carry error details in a way that can be nicely
+formatted
+
+** TODO Nicely display errors
+
+** TODO Provide better diagnostics on bad graphs
+
+The topological_sort function can only tell if it runs out of sortable
+elements; it cannot report if the reason is circular dependencies or a
+bad dependency.
+
+Another option here is to validate all dependencies before sorting, so
+there is only one possible error when sorting.
