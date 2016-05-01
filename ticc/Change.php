@@ -92,8 +92,7 @@ class Change {
         return $this->name === $other->name
             && $this->deploy_script === $other->deploy_script
             && $this->verify_script === $other->verify_script
-            && $this->revert_script === $other->revert_script;
-    }
+            && $this->revert_script === $other->revert_script;}
 
 
     public function inject_to($fn) {
