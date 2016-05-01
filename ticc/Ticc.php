@@ -114,6 +114,7 @@ class Ticc {
             case 'revert': $this->run_revert(); break;
             case 'sync': $this->run_sync(); break;
             case 'redeploy': $this->run_redeploy(); break;
+            case 'move': case 'mv': $this->run_move(); break;
             default: throw new exception\BadCommandException(
                 'Must give valid command: [deploy|revert|sync|redeploy]', 0x0c);}}
 
@@ -159,6 +160,15 @@ class Ticc {
                 $this->masterplan
                 ->minus($this->deployedplan
                         ->minus($stale_plan)));});}
+
+
+    private function run_move() {
+        /*
+         * Move a change in the source, updating dependencies and
+         * deployed plan
+         */
+        $this->masterplan->inject_changes_to([$this->change_directory, 'write_change']);
+    }
 
 
     private function deploy_plan($plan) {
