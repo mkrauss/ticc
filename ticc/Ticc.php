@@ -166,27 +166,14 @@ class Ticc {
          * Revert all changes in $plan
          */
         $plan->inject_changes_to(
-            function (string $change_name,
-                      array $dependencies,
-                      string $deploy=null,
-                      string $verify=null,
-                      string $revert=null) {
-                echo "Deploying: {$change_name}... ";
-                if (is_null($deploy))
+            function (Change $change) {
+                echo "Deploying: {$change->name}... ";
+                if (is_null($change->deploy_script))
                     echo "Nothing to deploy.\n";
                 else {
-                    $this->database->deploy_change(
-                        $change_name,
-                        $dependencies,
-                        $deploy,
-                        $verify,
-                        $revert);
+                    $this->database->deploy_change($change);
                     echo " Done.\n";}
-                $this->database->mark_deployed($change_name,
-                                               $dependencies,
-                                               $deploy,
-                                               $verify,
-                                               $revert);});}
+                $this->database->mark_deployed($change);});}
 
 
     private function revert_plan($plan) {
@@ -194,18 +181,14 @@ class Ticc {
          * Revert all changes in $plan
          */
         $plan->inject_changes_to(
-            function (string $change_name,
-                      array $dependencies,
-                      string $deploy=null,
-                      string $verify=null,
-                      string $revert=null) {
-                echo "Reverting: {$change_name}...";
-                if (is_null($revert))
+            function (Change $change) {
+                echo "Reverting: {$change->name}...";
+                if (is_null($change->revert_script))
                     echo "Nothing to revert.\n";
                 else {
-                    $this->database->revert_change($revert);
+                    $this->database->revert_change($change);
                     echo " Done.\n";}
-                $this->database->unmark_deployed($change_name);});}
+                $this->database->unmark_deployed($change);});}
 
 
     private function load_plans() {

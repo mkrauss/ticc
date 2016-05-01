@@ -128,6 +128,7 @@ class Database {
                 from \"{$this->schema}\".deployed;")
             ->fetchAll());}
 
+
     static private function translate_array_from_pg(string $array_rep) {
         /*
          * Given a string (?!) result from a PostgreSQL array,
@@ -147,73 +148,64 @@ class Database {
 
 
 
-    public function deploy_change(string $change_name,
-                                  array $dependencies,
-                                  string $deploy=null,
-                                  string $verify=null,
-                                  string $revert=null) {
+    public function deploy_change(Change $change) {
         /*
          * Deploy a change, making sure it is complete, and mark it deployed
          */
         $this->with_protection(
-            function() use ($change_name, $dependencies, $deploy, $verify, $revert) {
+            function() use ($change) {
 
                 $this->exec_to_fail(
-                    $verify, new exception\ChangeDeploymentError(
-                        "Change {$change_name} verifies before deploy"));
+                    $change->verify_script, new exception\ChangeDeploymentError(
+                        "Change {$change->name} verifies before deploy"));
 
                 $this->exec(
-                    $deploy, new exception\ChangeDeploymentError(
-                        "Change {$change_name} failed to deploy"));
+                    $change->deploy_script, new exception\ChangeDeploymentError(
+                        "Change {$change->name} failed to deploy"));
 
                 $this->exec_to_rollback(
-                    $verify, new exception\ChangeDeploymentError(
-                        "Change {$change_name} failed to verify"));
+                    $change->verify_script, new exception\ChangeDeploymentError(
+                        "Change {$change->name} failed to verify"));
 
                 $this->exec(
-                    $revert, new exception\ChangeDeploymentError(
-                        "Change {$change_name} failed to revert"));
+                    $change->revert_script, new exception\ChangeDeploymentError(
+                        "Change {$change->name} failed to revert"));
 
                 $this->exec_to_fail(
-                    $verify, new exception\ChangeDeploymentError(
-                        "Change {$change_name} verifies after revert"));
+                    $change->verify_script, new exception\ChangeDeploymentError(
+                        "Change {$change->name} verifies after revert"));
 
                 $this->exec(
-                    $deploy, new exception\ChangeDeploymentError(
-                        "Change {$change_name} failed to re-deploy"));
+                    $change->deploy_script, new exception\ChangeDeploymentError(
+                        "Change {$change->name} failed to re-deploy"));
 
                 $this->exec_to_rollback(
-                    $verify, new exception\ChangeDeploymentError(
-                        "Change {$change_name} failed to re-verify"));});}
+                    $change->verify_script, new exception\ChangeDeploymentError(
+                        "Change {$change->name} failed to re-verify"));});}
 
 
-    public function revert_change(string $revert) {
+    public function revert_change(Change $change) {
         /*
-         * Revert a single change $change_name with script $revert
+         * Revert a single Change $change
          */
-        $this->database->exec($revert);
-    }
+        $this->database->exec($change->revert_script);}
 
 
-    public function unmark_deployed($change_name) {
+    public function unmark_deployed(Change $change) {
         /*
          * Remove the deployment info for the given chnage
          */
         try {
             $this->database->exec("
                 delete from \"{$this->schema}\".deployed
-                where change = {$this->database->quote($change_name)};");}
+                where change = {$this->database->quote($change->name)};");}
         catch (\PDOException $error) {
             throw new exception\FailureToMarkChange(
-                "Could not clear change record {$change_name}",
+                "Could not clear change record {$change->name}",
                 $error->getCode(), $error);}}
 
 
-    public function mark_deployed(string $change_name,
-                                  array $dependencies,
-                                  string $deploy=null,
-                                  string $verify=null,
-                                  string $revert=null) {
+    public function mark_deployed(Change $change) {
         /*
          * Mark the given change deployed in the database
          */
@@ -221,24 +213,22 @@ class Database {
             . implode(
                 ',',
                 array_map(
-                    // function ($dependency) {
-                    //     return $this->database->quote($dependency); }
                     [$this->database, 'quote'],
-                    $dependencies))
+                    $change->dependencies))
             . ']::text[]';
 
         try {
             $this->database->exec("
                 insert into \"{$this->schema}\".deployed values (
-                       {$this->quote($change_name)}
+                       {$this->quote($change->name)}
                      , current_timestamp
                      , {$dependencies}
-                     , {$this->quote($deploy)}
-                     , {$this->quote($verify)}
-                     , {$this->quote($revert)});");}
+                     , {$this->quote($change->deploy_script)}
+                     , {$this->quote($change->verify_script)}
+                     , {$this->quote($change->revert_script)});");}
         catch (\PDOException $error) {
             throw new exception\FailureToMarkChange(
-                "Could not track change {$change_name}",
+                "Could not track change {$change->name}",
                 $error->getCode(), $error);}}
 
 

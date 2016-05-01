@@ -167,10 +167,9 @@ class Plan {
 
     public function inject_changes_to($fn) {
         /*
-         * Ask each change in the plan to inject_to $fn
+         * Call $fn for each change in the plan
          */
-        foreach ($this->plan as $change)
-            $change->inject_to($fn);}
+        foreach ($this->plan as $change) $fn($change);}
 
 
     private $plan;
