@@ -100,5 +100,36 @@ class ChangeSource {
             $subchanges);}
 
 
+    public function write_change(string $change_name,
+                                 array $dependencies,
+                                 string $deploy=null,
+                                 string $verify=null,
+                                 string $revert=null) {
+        /*
+         * Write a change back to directory tree form.
+         */
+        // testing:
+        echo '$change_name: ' . $change_name . PHP_EOL
+            . '$dependencies: ' . '[' . join(',',$dependencies) . ']' . PHP_EOL
+            . '$deploy: ' . $deploy . PHP_EOL
+            . '$verify: ' . $verify . PHP_EOL
+            . '$revert: ' . $revert . PHP_EOL;
+
+        mkdir($change_name, 0777, true);
+
+        if (!is_null($deploy)) {
+            file_put_contents("./{$change_name}/deploy.sql", $deploy);}
+
+        if (!is_null($verify)) {
+            file_put_contents("./{$change_name}/verify.sql", $verify);}
+
+        if (!is_null($revert)) {
+            file_put_contents("./{$change_name}/revert.sql", $revert);}
+
+        file_put_contents(
+            "./{$change_name}/plan.json",
+            json_encode(['dependencies' => $dependencies], JSON_PRETTY_PRINT));}
+
+
     private $directory;
 }
