@@ -187,30 +187,6 @@ class Database {
                         "Change {$change_name} failed to re-verify"));});}
 
 
-    public function revert_through($change_name) {
-        /*
-         * Revert all deployed changes back to and including the one
-         * named $change_name
-         */
-        $this->with_protection(
-            function() use ($change_name) {
-                $changes_to_revert = $this->database->query("
-                    select change, revert
-                    from \"{$this->schema}\".deployed
-                    natural join (
-                        select change
-                             , after
-                             , count(after) over (partition by change) as num
-                        from \"{$this->schema}\".deployed_after) change_w_num
-                    where after = {$this->database->quote($change_name)}
-                    order by num desc;")
-                    ->fetchAll();
-
-                foreach($changes_to_revert as $to_revert)
-                    $this->revert_change($to_revert['change'],
-                                         $to_revert['revert']);});}
-
-
     public function revert_change(string $revert) {
         /*
          * Revert a single change $change_name with script $revert
