@@ -95,18 +95,6 @@ class Change {
             && $this->revert_script === $other->revert_script;}
 
 
-    public function inject_to($fn) {
-        /*
-         * Call $fn passing it: $change_name, $change_plan, $deploy,
-         * $verify, $revert
-         */
-        $fn($this->name,
-            $this->dependencies,
-            $this->deploy_script,
-            $this->verify_script,
-            $this->revert_script);}
-
-
     public $name;
     public $dependencies;
     public $deploy_script = null;
