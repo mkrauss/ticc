@@ -37,7 +37,9 @@ class ChangeSource {
         $this->directory = $directory;}
 
 
-    public function changes($change_dirname = null, $implicit_dependencies = []) {
+    public function changes(string $change_dirname = null,
+                            array $implicit_dependencies = [])
+        : array {
         /*
          * Get all plan files under our $directory
          */
