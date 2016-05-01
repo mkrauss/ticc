@@ -107,9 +107,9 @@ class Change {
             $this->revert_script);}
 
 
-    private $name;
-    private $dependencies;
-    private $deploy_script = null;
-    private $revert_script = null;
-    private $verify_script = null;
+    public $name;
+    public $dependencies;
+    public $deploy_script = null;
+    public $revert_script = null;
+    public $verify_script = null;
 }
