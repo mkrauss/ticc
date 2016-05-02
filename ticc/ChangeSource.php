@@ -124,5 +124,14 @@ class ChangeSource {
                         JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));}
 
 
+    public function remove_change_named($change_name) {
+        /*
+         * Remove the change named $change_name from the source
+         */
+        if (!unlink("./{$change_name}")) {
+            throw new \Exception("Can't remove change {$change_name}");};
+    }
+
+
     private $directory;
 }
