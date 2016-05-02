@@ -95,6 +95,37 @@ class Plan {
         return $result;}
 
 
+    public function move_change(string $source_name, string $dest_name) {
+        /*
+         * Return a new Plan with the Change indicated by $source_name
+         * changed to $dest_name, and all dependencies that point to
+         * it updated.
+         */
+        $result = clone($this);
+
+        $result_name = function ($name) use ($source_name, $dest_name) {
+            return $name === $source_name
+                ? $dest_name
+                : $name;};
+
+        $map_names = F\partial_left('array_map', $result_name);
+
+        $result->plan = array_map(
+            function (Change $change) use ($result_name, $map_names) {
+                return new Change([
+                    'change_name' => $result_name($change->name),
+                    'dependencies' => $map_names(
+                        $change->dependencies),
+                    'explicit_dependencies' => $map_names(
+                        $change->explicit_dependencies),
+                    'deploy_script' => $change->deploy_script,
+                    'revert_script' => $change->revert_script,
+                    'verify_script' => $change->verify_script]);},
+            $this->plan);
+
+        return $result;}
+
+
     public function subplan($deployed_change_names, $target_change_name=null) {
         /*
          * Returns a new Plan representing the necessary changes to
