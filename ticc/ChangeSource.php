@@ -100,35 +100,28 @@ class ChangeSource {
             $subchanges);}
 
 
-    public function write_change(string $change_name,
-                                 array $dependencies,
-                                 string $deploy=null,
-                                 string $verify=null,
-                                 string $revert=null) {
+    public function write_change(Change $change) {
         /*
          * Write a change back to directory tree form.
          */
-        // testing:
-        echo '$change_name: ' . $change_name . PHP_EOL
-            . '$dependencies: ' . '[' . join(',',$dependencies) . ']' . PHP_EOL
-            . '$deploy: ' . $deploy . PHP_EOL
-            . '$verify: ' . $verify . PHP_EOL
-            . '$revert: ' . $revert . PHP_EOL;
+        if (!is_dir($change->name)) mkdir($change->name, 0777, true);
 
-        mkdir($change_name, 0777, true);
+        if (!is_null($change->deploy_script)) {
+            file_put_contents("./{$change->name}/deploy.sql",
+                              $change->deploy_script);}
 
-        if (!is_null($deploy)) {
-            file_put_contents("./{$change_name}/deploy.sql", $deploy);}
+        if (!is_null($change->verify_script)) {
+            file_put_contents("./{$change->name}/verify.sql",
+                              $change->verify_script);}
 
-        if (!is_null($verify)) {
-            file_put_contents("./{$change_name}/verify.sql", $verify);}
-
-        if (!is_null($revert)) {
-            file_put_contents("./{$change_name}/revert.sql", $revert);}
+        if (!is_null($change->revert_script)) {
+            file_put_contents("./{$change->name}/revert.sql",
+                              $change->revert_script);}
 
         file_put_contents(
-            "./{$change_name}/plan.json",
-            json_encode(['dependencies' => $dependencies], JSON_PRETTY_PRINT));}
+            "./{$change->name}/plan.json",
+            json_encode(['dependencies' => $change->explicit_dependencies],
+                        JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));}
 
 
     private $directory;
