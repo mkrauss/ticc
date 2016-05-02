@@ -167,7 +167,19 @@ class Ticc {
          * Move a change in the source, updating dependencies and
          * deployed plan
          */
-        $this->masterplan->inject_changes_to([$this->change_directory, 'write_change']);
+        if (count($this->args) < 2) {
+            throw new exception\BadCommandException(
+                'Please provide an origin change to move, and a destination.');}
+
+        $old = array_shift($this->args);
+        $new = array_shift($this->args);
+
+        $this->change_directory->remove_change_named($old);
+
+        $this->masterplan
+            ->move_change($old, $new)
+            ->inject_changes_to(
+                [$this->change_directory, 'write_change']);
     }
 
 
