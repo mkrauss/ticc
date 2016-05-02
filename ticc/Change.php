@@ -36,6 +36,7 @@ class Change {
 
         $this->name = $change_plan['change_name'];
         $this->dependencies = F\pick($change_plan, 'dependencies', []);
+        $this->explicit_dependencies = F\pick($change_plan, 'explicit_dependencies', []);
 
         if (isset($change_plan['deploy_script'])
             && isset($change_plan['revert_script'])
@@ -97,6 +98,7 @@ class Change {
 
     public $name;
     public $dependencies;
+    public $explicit_dependencies;
     public $deploy_script = null;
     public $revert_script = null;
     public $verify_script = null;

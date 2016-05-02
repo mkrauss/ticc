@@ -59,11 +59,12 @@ class ChangeSource {
             if (isset($change_plan_file['change_name']))
                 $change_plan['change_name'] = $change_plan_file['change_name'];
 
-            if (isset($change_plan_file['dependencies']))
+            if (isset($change_plan_file['dependencies'])) {
                 $change_plan['dependencies'] = array_unique(array_merge(
                     $change_plan['dependencies'],
                     $change_plan_file['dependencies']));
-        }
+                $change_plan['explicit_dependencies']
+                    = $change_plan_file['dependencies'];}}
 
         if (is_readable("{$change_dirname}deploy.sql"))
             $change_plan['deploy_script'] = file_get_contents(
