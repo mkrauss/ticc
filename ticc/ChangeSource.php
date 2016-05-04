@@ -128,9 +128,28 @@ class ChangeSource {
         /*
          * Remove the change named $change_name from the source
          */
-        if (!unlink("./{$change_name}")) {
-            throw new \Exception("Can't remove change {$change_name}");};
-    }
+        if (!is_dir($change_name)) {
+            throw new exception\BadChangeException(
+                "Change {$change_name} does not exist");}
+
+        $this->remove_change_file($change_name, 'deploy.sql');
+        $this->remove_change_file($change_name, 'verify.sql');
+        $this->remove_change_file($change_name, 'revert.sql');
+        $this->remove_change_file($change_name, 'plan.json');
+
+        if (count(glob("./{$change_name}/*")) === 0 ) {
+            if (!rmdir("./{$change_name}")) {
+                throw new \Exception(
+                    "Can't remove change directory {$change_name}");};}}
+
+
+    private function remove_change_file($change_name, $file) {
+        /*
+         * 
+         */
+        if (file_exists("./{$change_name}/{$file}")) {
+            if (!unlink("./{$change_name}/{$file}")) {
+                throw new \Exception("Can't remove {$change_name}/{$file}");}}}
 
 
     private $directory;
