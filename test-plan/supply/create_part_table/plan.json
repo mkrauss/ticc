@@ -1,4 +1,6 @@
 {
-    "dependencies": ["supply/create_supply_schema",
-                     "supply/create_supplier_table"]
+    "dependencies": [
+        "supply/create_supply_schema",
+        "supply/create_supplier_table"
+    ]
 }
