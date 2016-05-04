@@ -6,7 +6,8 @@
 
 ** TODO Export to Sqitch
 
-* TODO Command to move a change
+* DONE Command to move a change
+CLOSED: [2016-05-04 Wed 00:12]
 
 * TODO Better error reporting
 
