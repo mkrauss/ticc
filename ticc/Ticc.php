@@ -177,6 +177,7 @@ class Ticc {
         $this->change_directory->remove_change_named($old);
 
         $this->masterplan
+            ->explicit_dependencies($old)
             ->move_change($old, $new)
             ->inject_changes_to(
                 [$this->change_directory, 'write_change']);
