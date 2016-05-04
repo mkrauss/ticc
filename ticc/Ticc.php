@@ -172,7 +172,16 @@ class Ticc {
                 'Please provide an origin change to move, and a destination.');}
 
         $old = array_shift($this->args);
+
+        if ($old === "/") {
+            throw new exception\BadCommandException(
+                "Cannot move top level change");}
+
         $new = array_shift($this->args);
+
+        if ($new === $old) {
+            throw new exception\BadCommandException(
+                "Cannot move a change to itself");}
 
         $this->change_directory->remove_change_named($old);
 
