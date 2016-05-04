@@ -30,8 +30,8 @@ there is only one possible error when sorting.
 
 Would be nice to be able to modify a plan and write back the plan.json
 with just the changed bits modified, leaving original whitespace
-formatting. I remember seeing an enhanced json of some sort that had
-support for comments and other human-centric enhancements, and I think
-it also had this ability...
+formatting. Consider hjson...
+
+https://hjson.org/
 
 Another option: give up json and use more strictly defined format(s).
