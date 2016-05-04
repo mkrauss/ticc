@@ -126,6 +126,22 @@ class Plan {
         return $result;}
 
 
+    public function explicit_dependencies($change_name) {
+        /*
+         * Return a Plan containing only the Change $change_name and
+         * those directly explicitly depending on it.
+         */
+        $result = clone($this);
+
+        $result->plan = array_filter(
+            $this->plan,
+            function (Change $change) use ($change_name) {
+                return $change->name === $change_name
+                    || in_array($change_name, $change->explicit_dependencies); });
+
+        return $result;}
+
+
     public function subplan($deployed_change_names, $target_change_name=null) {
         /*
          * Returns a new Plan representing the necessary changes to
