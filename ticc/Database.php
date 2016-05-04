@@ -147,6 +147,24 @@ class Database {
                     trim($array_rep, '{}')));}
 
 
+    public function rename_change($old, $new) {
+        /*
+         * Update deployed changes renaming $old to $new in change
+         * names and dependencies
+         */
+        $this->with_protection(
+            function () use ($old, $new) {
+                $this->database->exec(
+                    "update \"{$this->schema}\".deployed
+                     set change = {$this->database->quote($new)}
+                     where change = {$this->database->quote($old)};");
+                $this->database->exec(
+                    "update \"{$this->schema}\".deployed
+                     set dependencies = array_replace(
+                         dependencies,
+                         {$this->database->quote($old)},
+                         {$this->database->quote($new)});");});}
+
 
     public function deploy_change(Change $change) {
         /*
