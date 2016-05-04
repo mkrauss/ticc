@@ -181,6 +181,8 @@ class Ticc {
             ->move_change($old, $new)
             ->inject_changes_to(
                 [$this->change_directory, 'write_change']);
+
+        $this->database->rename_change($old, $new);
     }
 
 
