@@ -43,7 +43,10 @@ under certain conditions; type `$argv[0] license -c' for details.
 
 
 EOT;
-    (new \ticc\Ticc ($argv))->run();
+
+    $ticc = new \ticc\Ticc ($argv);
+    $verbose_p = $ticc->get_parameter('verbose');
+    $ticc->run();
 }
 catch (\Exception $e) {
     // On exception, print to STDERR and leave with the thrown error code
@@ -53,7 +56,7 @@ catch (\Exception $e) {
     // 0xff - Undefined error code
     $stderr = fopen('php://stderr', 'rw');
     fputs($stderr, 'FATAL ERROR:' . PHP_EOL);
-    fputs($stderr, substr($e, 0, 1022) . PHP_EOL . PHP_EOL, 1024);
+    fputs($stderr, substr($verbose_p ? $e : $e->getMessage(), 0, 1022) . PHP_EOL . PHP_EOL, 1024);
     fclose($stderr);
 
     $code = $e->getCode() > 0 ? $e->getCode() : 0xff;
