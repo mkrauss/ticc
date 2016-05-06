@@ -158,8 +158,20 @@ class Plan {
         return $subplan;}
 
 
+    public function superplan($target_change_name) {
+        /*
+         * Return a Plan representing the Change $target_change_name
+         * and all Changes depending on it
+         */
+        $superplan = clone($this);
 
+        $superplan->plan = F\select(
+            $this->plan,
+            function ($proposed_change) use ($target_change_name) {
+                return $this->dependency_exists($proposed_change->name(),
+                                                $target_change_name);});
 
+        return $superplan;}
 
 
     public function dependency_exists(string $dependant_name, string $dependency_name) {
