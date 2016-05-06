@@ -170,7 +170,7 @@ class Plan {
         return $subplan;}
 
 
-    public function dependency_exists($dependant_name, $dependency_name) {
+    public function dependency_exists(string $dependant_name, string $dependency_name) {
         /*
          * Does Change $dependant depends directly or indirectly on
          * Change $dependency?
@@ -179,8 +179,8 @@ class Plan {
             || F\some(
                 $this->find_change_by_name($dependant_name)->dependencies(),
                 function ($dependant_name) use ($dependency_name) {
-                    $this->dependency_exists($dependant_name,
-                                             $dependency_name);});}
+                    return $this->dependency_exists($dependant_name,
+                                                    $dependency_name);});}
 
     // public function dependency_exists($dependant, $dependency_name) {
     //     /*
