@@ -126,8 +126,10 @@ class Ticc {
          */
         $this->database->with_protection(function() {
             $this->deploy_plan(
-                $this->masterplan->minus(
-                    $this->deployedplan));});}
+                (count($this->args) === 1
+                 ? $this->masterplan->subplan(array_shift($this->args))
+                 : $this->masterplan)
+                ->minus($this->deployedplan));});}
 
 
     private function run_revert() {
