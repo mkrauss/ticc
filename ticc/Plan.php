@@ -142,32 +142,24 @@ class Plan {
         return $result;}
 
 
-    public function subplan($deployed_change_names, $target_change_name=null) {
+    public function subplan($target_change_name) {
         /*
-         * Returns a new Plan representing the necessary changes to
-         * deploy $target_change assuming that the array of
-         * $deployed_changes are already deployed
+         * Return a Plan representing the necessary Changes to deploy
+         * $target_change
          */
         $subplan = clone($this);
 
         $subplan->plan = F\select(
             $this->plan,
-
-            is_null($target_change_name)
-
-            ? function ($proposed_change) use ($deployed_change_names) {
-                return !F\contains($deployed_change_names,
-                                   $proposed_change->name());}
-
-            : function ($proposed_change)
-                use ($deployed_change_names, $target_change_name) {
-                    $proposed_change_name = $proposed_change->name();
-                    return !F\contains($deployed_change_names,
-                                       $proposed_change_name)
-                        && $this->dependency_exists($target_change_name,
-                                                    $proposed_change_name);});
+            function ($proposed_change) use ($target_change_name) {
+                return $this->dependency_exists($target_change_name,
+                                                $proposed_change->name());});
 
         return $subplan;}
+
+
+
+
 
 
     public function dependency_exists(string $dependant_name, string $dependency_name) {
