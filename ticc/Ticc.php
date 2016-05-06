@@ -140,7 +140,10 @@ class Ticc {
         // var_export($this->deployedplan->reverse()); die(PHP_EOL);
         $this->database->with_protection(function() {
             $this->revert_plan(
-                $this->deployedplan->reverse());});}
+                (count($this->args) === 1
+                 ? $this->deployedplan->superplan(array_shift($this->args))
+                 : $this->deployedplan)
+                ->reverse());});}
 
 
     private function run_sync() {
