@@ -186,19 +186,6 @@ class Plan {
                     return $this->dependency_exists($dependant_name,
                                                     $dependency_name);});}
 
-    // public function dependency_exists($dependant, $dependency_name) {
-    //     /*
-    //      * Does Change $dependant depends directly or indirectly on
-    //      * Change $dependency?
-    //      */
-    //     return $dependant->name() === $dependency_name
-    //         || F\some(
-    //             $dependant->dependencies(),
-    //             function ($dependant_name) use ($dependency_name) {
-    //                 $this->dependency_exists(
-    //                     $this->find_change_by_name($dependant_name),
-    //                     $dependency_name);});}
-
 
     public function find_change_by_name($change_name) {
         /*
