@@ -104,23 +104,23 @@ class ChangeSource {
         /*
          * Write a change back to directory tree form.
          */
-        if (!is_dir($change->name)) mkdir($change->name, 0777, true);
+        if (!is_dir($change->name())) mkdir($change->name, 0777, true);
 
-        if (!is_null($change->deploy_script)) {
-            file_put_contents("./{$change->name}/deploy.sql",
-                              $change->deploy_script);}
+        if (!is_null($change->deploy_script())) {
+            file_put_contents("./{$change->name()}/deploy.sql",
+                              $change->deploy_script());}
 
-        if (!is_null($change->verify_script)) {
-            file_put_contents("./{$change->name}/verify.sql",
-                              $change->verify_script);}
+        if (!is_null($change->verify_script())) {
+            file_put_contents("./{$change->name()}/verify.sql",
+                              $change->verify_script());}
 
-        if (!is_null($change->revert_script)) {
-            file_put_contents("./{$change->name}/revert.sql",
-                              $change->revert_script);}
+        if (!is_null($change->revert_script())) {
+            file_put_contents("./{$change->name()}/revert.sql",
+                              $change->revert_script());}
 
         file_put_contents(
-            "./{$change->name}/plan.json",
-            json_encode(['dependencies' => $change->explicit_dependencies],
+            "./{$change->name()}/plan.json",
+            json_encode(['dependencies' => $change->explicit_dependencies()],
                         JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));}
 
 

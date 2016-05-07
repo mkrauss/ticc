@@ -113,14 +113,14 @@ class Plan {
         $result->plan = array_map(
             function (Change $change) use ($result_name, $map_names) {
                 return new Change([
-                    'change_name' => $result_name($change->name),
+                    'change_name' => $result_name($change->name()),
                     'dependencies' => $map_names(
-                        $change->dependencies),
+                        $change->dependencies()),
                     'explicit_dependencies' => $map_names(
-                        $change->explicit_dependencies),
-                    'deploy_script' => $change->deploy_script,
-                    'revert_script' => $change->revert_script,
-                    'verify_script' => $change->verify_script]);},
+                        $change->explicit_dependencies()),
+                    'deploy_script' => $change->deploy_script(),
+                    'revert_script' => $change->revert_script(),
+                    'verify_script' => $change->verify_script()]);},
             $this->plan);
 
         return $result;}
@@ -136,8 +136,8 @@ class Plan {
         $result->plan = array_filter(
             $this->plan,
             function (Change $change) use ($change_name) {
-                return $change->name === $change_name
-                    || in_array($change_name, $change->explicit_dependencies); });
+                return $change->name() === $change_name
+                    || in_array($change_name, $change->explicit_dependencies()); });
 
         return $result;}
 

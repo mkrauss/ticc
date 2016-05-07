@@ -206,8 +206,8 @@ class Ticc {
          */
         $plan->inject_changes_to(
             function (Change $change) {
-                echo "Deploying: {$change->name}... ";
-                if (is_null($change->deploy_script))
+                echo "Deploying: {$change->name()}... ";
+                if (is_null($change->deploy_script()))
                     echo "Nothing to deploy.\n";
                 else {
                     $this->database->deploy_change($change);
@@ -221,8 +221,8 @@ class Ticc {
          */
         $plan->inject_changes_to(
             function (Change $change) {
-                echo "Reverting: {$change->name}...";
-                if (is_null($change->revert_script))
+                echo "Reverting: {$change->name()}...";
+                if (is_null($change->revert_script()))
                     echo "Nothing to revert.\n";
                 else {
                     $this->database->revert_change($change);
