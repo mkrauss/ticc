@@ -155,7 +155,9 @@ class Ticc {
             echo PHP_EOL;
 
             $this->deploy_plan(
-                $this->masterplan
+                (count($this->args) === 1
+                 ? $this->masterplan->subplan(array_shift($this->args))
+                 : $this->masterplan)
                 ->minus($this->deployedplan
                         ->minus($stale_plan)));});}
 
