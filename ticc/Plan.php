@@ -114,14 +114,14 @@ class Plan {
         $result->plan = array_map(
             function (Change $change) use ($result_name, $map_names) {
                 return new Change([
-                    'change_name' => $result_name($change->name),
+                    'change_name' => $result_name($change->name()),
                     'dependencies' => $map_names(
-                        $change->dependencies),
+                        $change->dependencies()),
                     'explicit_dependencies' => $map_names(
-                        $change->explicit_dependencies),
-                    'deploy_script' => $change->deploy_script,
-                    'revert_script' => $change->revert_script,
-                    'verify_script' => $change->verify_script]);},
+                        $change->explicit_dependencies()),
+                    'deploy_script' => $change->deploy_script(),
+                    'revert_script' => $change->revert_script(),
+                    'verify_script' => $change->verify_script()]);},
             $this->plan);
 
         return $result;}
@@ -137,41 +137,45 @@ class Plan {
         $result->plan = array_filter(
             $this->plan,
             function (Change $change) use ($change_name) {
-                return $change->name === $change_name
-                    || in_array($change_name, $change->explicit_dependencies); });
+                return $change->name() === $change_name
+                    || in_array($change_name, $change->explicit_dependencies()); });
 
         return $result;}
 
 
-    public function subplan($deployed_change_names, $target_change_name=null) {
+    public function subplan($target_change_name) {
         /*
-         * Returns a new Plan representing the necessary changes to
-         * deploy $target_change assuming that the array of
-         * $deployed_changes are already deployed
+         * Return a Plan representing the necessary Changes to deploy
+         * $target_change
          */
         $subplan = clone($this);
 
         $subplan->plan = F\select(
             $this->plan,
-
-            is_null($target_change_name)
-
-            ? function ($proposed_change) use ($deployed_change_names) {
-                return !F\contains($deployed_change_names,
-                                   $proposed_change->name());}
-
-            : function ($proposed_change)
-                use ($deployed_change_names, $target_change_name) {
-                    $proposed_change_name = $proposed_change->name();
-                    return !F\contains($deployed_change_names,
-                                       $proposed_change_name)
-                        && $this->dependency_exists($target_change_name,
-                                                    $proposed_change_name);});
+            function ($proposed_change) use ($target_change_name) {
+                return $this->dependency_exists($target_change_name,
+                                                $proposed_change->name());});
 
         return $subplan;}
 
 
-    public function dependency_exists($dependant_name, $dependency_name) {
+    public function superplan($target_change_name) {
+        /*
+         * Return a Plan representing the Change $target_change_name
+         * and all Changes depending on it
+         */
+        $superplan = clone($this);
+
+        $superplan->plan = F\select(
+            $this->plan,
+            function ($proposed_change) use ($target_change_name) {
+                return $this->dependency_exists($proposed_change->name(),
+                                                $target_change_name);});
+
+        return $superplan;}
+
+
+    public function dependency_exists(string $dependant_name, string $dependency_name) {
         /*
          * Does Change $dependant depends directly or indirectly on
          * Change $dependency?
@@ -180,21 +184,8 @@ class Plan {
             || F\some(
                 $this->find_change_by_name($dependant_name)->dependencies(),
                 function ($dependant_name) use ($dependency_name) {
-                    $this->dependency_exists($dependant_name,
-                                             $dependency_name);});}
-
-    // public function dependency_exists($dependant, $dependency_name) {
-    //     /*
-    //      * Does Change $dependant depends directly or indirectly on
-    //      * Change $dependency?
-    //      */
-    //     return $dependant->name() === $dependency_name
-    //         || F\some(
-    //             $dependant->dependencies(),
-    //             function ($dependant_name) use ($dependency_name) {
-    //                 $this->dependency_exists(
-    //                     $this->find_change_by_name($dependant_name),
-    //                     $dependency_name);});}
+                    return $this->dependency_exists($dependant_name,
+                                                    $dependency_name);});}
 
 
     public function find_change_by_name($change_name) {

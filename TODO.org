@@ -9,6 +9,34 @@
 * DONE Command to move a change
 CLOSED: [2016-05-04 Wed 00:12]
 
+* TODO Sync dependencies
+
+Right now sync ignores when just dependencies are altered on a
+deployed Change. It isn't necessary to re-deploy since it obviously
+got deployed.
+
+** TODO Just DB update clean dependency changes
+
+When only the dependencies of a Change are different, they should be
+directly updated in the deployed plan, since they are probably
+correcting a dependency problem that might otherwise prevent revert.
+
+** TODO Deal with messy dependency changes
+
+In the event that DDL has also changed, the new dependencies may
+reflect that change, may correct earlier dependency issues, or may do
+both:
+
+- Since the first case is most likely, we should probably do the
+  revert based on the original dependencies
+- We could try that and failing it try changing the dependencies first
+  instead
+- We may also need in a worst case where dependency corrections and
+  new dependencies are combined to try the revert with all
+  dependencies combined
+- Even then, we may fail if the combined dependencies introduce
+  problems such as circularity?
+
 * TODO Better error reporting
 
 ** TODO Probably want a top level UserError exception

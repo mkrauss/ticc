@@ -52,22 +52,6 @@ class Change {
             throw new exception\BadChangeException("Incomplete change {$this->name}");}}
 
 
-    public function name() {
-        /*
-         * Return the name of this change
-         */
-
-        return $this->name;}
-
-
-    public function dependencies() {
-        /*
-         * Return the list of changes this one immediately depends on
-         */
-
-        return $this->dependencies;}
-
-
     public function depends_on($change_name) {
         /*
          * Return true if this change directly depends on a change
@@ -96,10 +80,21 @@ class Change {
             && $this->revert_script === $other->revert_script;}
 
 
-    public $name;
-    public $dependencies;
-    public $explicit_dependencies;
-    public $deploy_script = null;
-    public $revert_script = null;
-    public $verify_script = null;
+    private $name;
+    public function name() { return $this->name; }
+
+    private $dependencies;
+    public function dependencies() { return $this->dependencies; }
+
+    private $explicit_dependencies;
+    public function explicit_dependencies() { return $this->explicit_dependencies; }
+
+    private $deploy_script = null;
+    public function deploy_script() { return $this->deploy_script; }
+
+    private $revert_script = null;
+    public function revert_script() { return $this->revert_script; }
+
+    private $verify_script = null;
+    public function verify_script() { return $this->verify_script; }
 }

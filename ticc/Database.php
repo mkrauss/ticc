@@ -174,39 +174,39 @@ class Database {
             function() use ($change) {
 
                 $this->exec_to_fail(
-                    $change->verify_script, new exception\ChangeDeploymentError(
-                        "Change {$change->name} verifies before deploy"));
+                    $change->verify_script(), new exception\ChangeDeploymentError(
+                        "Change {$change->name()} verifies before deploy"));
 
                 $this->exec(
-                    $change->deploy_script, new exception\ChangeDeploymentError(
-                        "Change {$change->name} failed to deploy"));
+                    $change->deploy_script(), new exception\ChangeDeploymentError(
+                        "Change {$change->name()} failed to deploy"));
 
                 $this->exec_to_rollback(
-                    $change->verify_script, new exception\ChangeDeploymentError(
-                        "Change {$change->name} failed to verify"));
+                    $change->verify_script(), new exception\ChangeDeploymentError(
+                        "Change {$change->name()} failed to verify"));
 
                 $this->exec(
-                    $change->revert_script, new exception\ChangeDeploymentError(
-                        "Change {$change->name} failed to revert"));
+                    $change->revert_script(), new exception\ChangeDeploymentError(
+                        "Change {$change->name()} failed to revert"));
 
                 $this->exec_to_fail(
-                    $change->verify_script, new exception\ChangeDeploymentError(
-                        "Change {$change->name} verifies after revert"));
+                    $change->verify_script(), new exception\ChangeDeploymentError(
+                        "Change {$change->name()} verifies after revert"));
 
                 $this->exec(
-                    $change->deploy_script, new exception\ChangeDeploymentError(
-                        "Change {$change->name} failed to re-deploy"));
+                    $change->deploy_script(), new exception\ChangeDeploymentError(
+                        "Change {$change->name()} failed to re-deploy"));
 
                 $this->exec_to_rollback(
-                    $change->verify_script, new exception\ChangeDeploymentError(
-                        "Change {$change->name} failed to re-verify"));});}
+                    $change->verify_script(), new exception\ChangeDeploymentError(
+                        "Change {$change->name()} failed to re-verify"));});}
 
 
     public function revert_change(Change $change) {
         /*
          * Revert a single Change $change
          */
-        $this->database->exec($change->revert_script);}
+        $this->database->exec($change->revert_script());}
 
 
     public function unmark_deployed(Change $change) {
@@ -216,10 +216,10 @@ class Database {
         try {
             $this->database->exec("
                 delete from \"{$this->schema}\".deployed
-                where change = {$this->database->quote($change->name)};");}
+                where change = {$this->database->quote($change->name())};");}
         catch (\PDOException $error) {
             throw new exception\FailureToMarkChange(
-                "Could not clear change record {$change->name}",
+                "Could not clear change record {$change->name()}",
                 $error->getCode(), $error);}}
 
 
@@ -232,21 +232,21 @@ class Database {
                 ',',
                 array_map(
                     [$this->database, 'quote'],
-                    $change->dependencies))
+                    $change->dependencies()))
             . ']::text[]';
 
         try {
             $this->database->exec("
                 insert into \"{$this->schema}\".deployed values (
-                       {$this->quote($change->name)}
+                       {$this->quote($change->name())}
                      , current_timestamp
                      , {$dependencies}
-                     , {$this->quote($change->deploy_script)}
-                     , {$this->quote($change->verify_script)}
-                     , {$this->quote($change->revert_script)});");}
+                     , {$this->quote($change->deploy_script())}
+                     , {$this->quote($change->verify_script())}
+                     , {$this->quote($change->revert_script())});");}
         catch (\PDOException $error) {
             throw new exception\FailureToMarkChange(
-                "Could not track change {$change->name}",
+                "Could not track change {$change->name()}",
                 $error->getCode(), $error);}}
 
 
