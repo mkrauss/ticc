@@ -35,13 +35,6 @@ class Ticc {
 
         $this->load_config();
 
-        // var_export(['called_as' => $this->called_as,
-        //             'command' => $this->command,
-        //             'params' => $this->params,
-        //             'args' => $this->args,
-        //             'config' => $this->config]);
-        // echo PHP_EOL;
-
         $this->connect_db();
 
         $this->find_change_dir();
