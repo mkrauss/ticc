@@ -104,7 +104,7 @@ class ChangeSource {
         /*
          * Write a change back to directory tree form.
          */
-        if (!is_dir($change->name())) mkdir($change->name, 0777, true);
+        if (!is_dir($change->name())) mkdir($change->name(), 0777, true);
 
         if (!is_null($change->deploy_script())) {
             file_put_contents("./{$change->name()}/deploy.sql",
