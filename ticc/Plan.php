@@ -78,15 +78,8 @@ class Plan {
         $result->plan = F\select(
             $this->plan,
             function (Change $change) use ($other, &$included_names) {
-                $include
-                    = F\some(
-                        $included_names,
-                        function (string $included_name) use ($change) {
-                            return $change->depends_on($included_name);})
-                    || F\none(
-                        $other->plan,
-                        function (Change $otherchange) use ($change) {
-                            return $change->equivalent_to($otherchange);});
+                $include = (F\some($included_names, [$change, 'depends_on'])
+                            || F\none($other->plan, [$change, 'equivalent_to']));
 
                 if ($include) array_push($included_names, $change->name());
 
