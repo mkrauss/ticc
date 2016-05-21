@@ -237,13 +237,15 @@ class Database {
 
         try {
             $this->database->exec("
-                insert into \"{$this->schema}\".deployed values (
-                       {$this->quote($change->name())}
+                insert into \"{$this->schema}\".deployed
+                select {$this->quote($change->name())}
                      , current_timestamp
                      , {$dependencies}
                      , {$this->quote($change->deploy_script())}
                      , {$this->quote($change->verify_script())}
-                     , {$this->quote($change->revert_script())});");}
+                     , {$this->quote($change->revert_script())}
+                where {$this->quote($change->name())} not in (
+                    select change from \"{$this->schema}\".deployed);");}
         catch (\PDOException $error) {
             throw new exception\FailureToMarkChange(
                 "Could not track change {$change->name()}",
