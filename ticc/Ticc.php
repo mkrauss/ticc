@@ -107,8 +107,9 @@ class Ticc {
             case 'revert': $this->run_revert(); break;
             case 'sync': $this->run_sync(); break;
             case 'move': case 'mv': $this->run_move(); break;
+            case 'verify': $this->run_verify(); break;
             default: throw new exception\BadCommandException(
-                'Must give valid command: [deploy|revert|sync|move]', 0x0c);}}
+                'Must give valid command: [deploy|revert|sync|move|verify]', 0x0c);}}
 
 
     private function run_deploy() {
@@ -159,6 +160,19 @@ class Ticc {
                  : $this->masterplan)
                 ->minus($this->deployedplan
                         ->minus($stale_plan)));});}
+
+
+    public function run_verify() {
+        /*
+         * Find the minimum subplan to deploy <change> and, for each
+         * Change, run the verify script to confirm it is legitimately
+         * deployed and mark it so.
+         */
+        $this->database->with_protection(function() {
+            $this->verify_plan(
+                (count($this->args) === 1
+                 ? $this->masterplan->subplan(array_shift($this->args))
+                 : $this->masterplan));});}
 
 
     private function run_move() {
