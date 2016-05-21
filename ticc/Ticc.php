@@ -210,7 +210,7 @@ class Ticc {
 
     private function deploy_plan($plan) {
         /*
-         * Revert all changes in $plan
+         * Deploy all changes in $plan
          */
         $plan->inject_changes_to(
             function (Change $change) {
