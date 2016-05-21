@@ -224,6 +224,21 @@ class Ticc {
                 $this->database->unmark_deployed($change);});}
 
 
+    private function verify_plan($plan) {
+        /*
+         * Verify all changes in $plan
+         */
+        $plan->inject_changes_to(
+            function (Change $change) {
+                echo "Verifying: {$change->name()}... ";
+                if (is_null($change->verify_script()))
+                    echo "Nothing to verify.\n";
+                else {
+                    $this->database->verify_change($change);
+                    echo " Good.\n";}
+                $this->database->mark_deployed($change);});}
+
+
     private function load_plans() {
         /*
          * Loads a plan of changes from the given $plan_dir
