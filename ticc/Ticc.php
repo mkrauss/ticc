@@ -106,10 +106,9 @@ class Ticc {
             case 'deploy': $this->run_deploy(); break;
             case 'revert': $this->run_revert(); break;
             case 'sync': $this->run_sync(); break;
-            case 'redeploy': $this->run_redeploy(); break;
             case 'move': case 'mv': $this->run_move(); break;
             default: throw new exception\BadCommandException(
-                'Must give valid command: [deploy|revert|sync|redeploy]', 0x0c);}}
+                'Must give valid command: [deploy|revert|sync|move]', 0x0c);}}
 
 
     private function run_deploy() {
