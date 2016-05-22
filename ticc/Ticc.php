@@ -119,10 +119,7 @@ class Ticc {
          */
         $this->database->with_protection(function() {
             $this->deploy_plan(
-                (count($this->args) === 1
-                 ? $this->masterplan->subplan(array_shift($this->args))
-                 : $this->masterplan)
-                ->minus($this->deployedplan));});}
+                $this->plan_to_deploy()->minus($this->deployedplan));});}
 
 
     private function run_revert() {
@@ -133,10 +130,7 @@ class Ticc {
         // var_export($this->deployedplan->reverse()); die(PHP_EOL);
         $this->database->with_protection(function() {
             $this->revert_plan(
-                (count($this->args) === 1
-                 ? $this->deployedplan->superplan(array_shift($this->args))
-                 : $this->deployedplan)
-                ->reverse());});}
+                $this->plan_to_revert()->reverse());});}
 
 
     private function run_sync() {
@@ -155,11 +149,8 @@ class Ticc {
             echo PHP_EOL;
 
             $this->deploy_plan(
-                (count($this->args) === 1
-                 ? $this->masterplan->subplan(array_shift($this->args))
-                 : $this->masterplan)
-                ->minus($this->deployedplan
-                        ->minus($stale_plan)));});}
+                $this->plan_to_deploy()->minus($this->deployedplan
+                                               ->minus($stale_plan)));});}
 
 
     public function run_verify() {
@@ -169,10 +160,7 @@ class Ticc {
          * deployed and mark it so.
          */
         $this->database->with_protection(function() {
-            $this->verify_plan(
-                (count($this->args) === 1
-                 ? $this->masterplan->subplan(array_shift($this->args))
-                 : $this->masterplan));});}
+            $this->verify_plan($this->plan_to_deploy());});}
 
 
     private function run_move() {
@@ -251,6 +239,30 @@ class Ticc {
                     $this->database->verify_change($change);
                     echo " Good.\n";}
                 $this->database->mark_deployed($change);});}
+
+
+    private function plan_to_deploy() {
+        /*
+         * Takes the next argument as a Change name and returns a
+         * minimum subset of the master plan to deploy that Change; if
+         * there is no next argument, returns the complete master
+         * plan.
+         */
+        return (count($this->args) >= 1
+                ? $this->masterplan->subplan(array_shift($this->args))
+                : $this->masterplan);}
+
+
+    private function plan_to_revert() {
+        /*
+         * Takes the next argument as a Change name and returns a
+         * minimum subset of the deployed plan to revert that Change;
+         * if there is no next argument, returns the complete deployed
+         * plan.
+         */
+        return (count($this->args) >= 1
+                ? $this->deployedplan->superplan(array_shift($this->args))
+                : $this->deployedplan);}
 
 
     private function load_plans() {
