@@ -27,7 +27,7 @@ namespace ticc;
 use Functional as F;
 
 class Plan {
-    public function __construct($changes) {
+    public function __construct(array $changes) {
         /*
          * Configure the plan
          */
@@ -37,7 +37,7 @@ class Plan {
             function ($change) { return $change->dependencies(); });}
 
 
-    public function minus(Plan $other) {
+    public function minus(Plan $other) : Plan {
         /*
          * Return a new plan representing the Changes in this plan
          * which do not appear, by name, in $other.
@@ -55,7 +55,7 @@ class Plan {
         return $result;}
 
 
-    public function reverse() {
+    public function reverse() : Plan {
         /*
          * Return a new plan representing the reverse of this one.
          */
@@ -64,7 +64,7 @@ class Plan {
         return $result;}
 
 
-    public function different_from(Plan $other) {
+    public function different_from(Plan $other) : Plan {
         /*
          * Return a new plan representing the Changes in this plan
          * which are either missing (by name) or changed (by scripts)
@@ -79,15 +79,8 @@ class Plan {
         $result->plan = F\select(
             $this->plan,
             function (Change $change) use ($other, &$included_names) {
-                $include
-                    = F\some(
-                        $included_names,
-                        function (string $included_name) use ($change) {
-                            return $change->depends_on($included_name);})
-                    || F\none(
-                        $other->plan,
-                        function (Change $otherchange) use ($change) {
-                            return $change->equivalent_to($otherchange);});
+                $include = (F\some($included_names, [$change, 'depends_on'])
+                            || F\none($other->plan, [$change, 'equivalent_to']));
 
                 if ($include) array_push($included_names, $change->name());
 
@@ -127,7 +120,7 @@ class Plan {
         return $result;}
 
 
-    public function explicit_dependencies($change_name) {
+    public function explicit_dependencies(string $change_name) : Plan {
         /*
          * Return a Plan containing only the Change $change_name and
          * those directly explicitly depending on it.
@@ -143,7 +136,7 @@ class Plan {
         return $result;}
 
 
-    public function subplan($target_change_name) {
+    public function subplan(string $target_change_name) : Plan {
         /*
          * Return a Plan representing the necessary Changes to deploy
          * $target_change
@@ -159,7 +152,7 @@ class Plan {
         return $subplan;}
 
 
-    public function superplan($target_change_name) {
+    public function superplan(string $target_change_name) : Plan {
         /*
          * Return a Plan representing the Change $target_change_name
          * and all Changes depending on it
@@ -175,7 +168,7 @@ class Plan {
         return $superplan;}
 
 
-    public function dependency_exists(string $dependant_name, string $dependency_name) {
+    public function dependency_exists(string $dependant_name, string $dependency_name) : bool {
         /*
          * Does Change $dependant depends directly or indirectly on
          * Change $dependency?
@@ -188,7 +181,7 @@ class Plan {
                                                     $dependency_name);});}
 
 
-    public function find_change_by_name($change_name) {
+    public function find_change_by_name(string $change_name) : Change {
         /*
          * Find the change named $change_name in the plan
          */
@@ -204,7 +197,7 @@ class Plan {
         return $change;}
 
 
-    public function inject_changes_to($fn) {
+    public function inject_changes_to(callable $fn) {
         /*
          * Call $fn for each change in the plan
          */

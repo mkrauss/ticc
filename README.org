@@ -187,23 +187,129 @@ optionally contain any of:
 
 ** Commands
 
-*** ticc deploy
+*** Sync
+
+#+begin_src sh
+  ticc sync [ <change-name-to-sync-to> ]
+#+end_src
+
+Revert any changes that are in name or script different from the
+master plan (the one represented by your plan directories), as well as
+any changes which depend directly or indirectly on those; then deploy
+all undeployed changes. This should sync your deployed database up
+with the master plan, and is usually the only command you should need.
+
+If you provide the optional =change-name-to-sync-to=, the deploy phase
+will be limited to the minimum set of changes necessary to deploy the
+one given. This is primarily useful if you have some errors in your
+plan, and are trying to work on one section without having Ticc try to
+sync other parts that you know do not work.
+
+**** Examples
+
+#+begin_src sh
+  ticc sync supply
+  ticc sync
+#+end_src
+
+*** Revert
+
+#+begin_src sh
+  ticc revert [ <change-name-to-revert-to> ]
+#+end_src
+
+Revert all deployed changes.
+
+If you provide the optional =change-name-to-sync-to=, the command will
+be limited to the minimum set of changes necessary to revert the one
+given. This is most likely to be useful in the case that you deployed
+a Change with insufficient dependencies specified. This allows you to
+force Ticc to revert Changes in an order that it might not otherwise
+choose and correct the problem.
+
+**** Examples
+
+#+begin_src sh
+  ticc revert supply
+  ticc revert
+#+end_src
+
+*** Deploy
+
+#+begin_src sh
+  ticc deploy [ <change-name-to-deploy-to> ]
+#+end_src
 
 Deploy the master plan (the one represented by your plan directories).
 Does not re-deploy any already deployed changes (by name, even if they
 are different from the version deployed).
 
-*** ticc revert
+If you provide the optional =change-name-to-deploy-to=, the command
+will be limited to the minimum set of changes necessary to deploy the
+one given.
 
-Revert all deployed changes.
+Although you can use this to simply deploy Changes, it is generally
+better to use [[*Sync]], which will correctly handle modified Changes.
 
-*** ticc sync
+**** Examples
 
-Revert any changes that are in name or script different from the
-master plan, as well as any changes which depend directly or
-indirectly on those; then deploy all undeployed changes. This should
-sync your deployed database up with the master plan, and is usually
-the only command you should need.
+#+begin_src sh
+  ticc deploy supply
+  ticc deploy
+#+end_src
+
+*** Verify
+
+#+begin_src sh
+  ticc verify [ <change-name-to-verify-to> ]
+#+end_src
+
+Verify the master plan (the one represented by your plan directories).
+This does not deploy or revert anything, but serves two purposes.
+
+It re-runs the verify script for each Change and confirms that it was
+deployed. If any Change with a verify script does not verify, it will
+throw an error. This may be helpful if you, for instance, want to
+confirm that your database hasn't been modified outside of Ticc.
+
+It will also mark the successfully verified Changes as being deployed.
+This may be useful if, somehow, Changes are deployed without Ticc
+knowing about it, and you want to mark them.
+
+*Warning*: Since the Changes being verified may have dependent Changes
+already deployed, they cannot be fully tested. Ticc cannot revert and
+re-deploy them to confirm the scripts are correct. It can /only/ run
+the verify script. This should only be used to mark Changes completed
+when you already know they are correct, and correctly deployed.
+
+**** Examples
+
+#+begin_src sh
+  ticc verify supply
+  ticc verify
+#+end_src
+
+*** Move
+
+#+begin_src sh
+  ticc move [ <origin-change-name> <destination-change-name> ]
+#+end_src
+
+Rename Change =origin-change-name= to =destination-change-name=. This
+moves the Change directory in your plan; updates and dependencies on
+it; and updates the deployed plan to reflect the new path. This does
+not change the actual effective plan but is useful when refactoring
+your plan, to arrange the plan change tree.
+
+**** Examples
+
+#+begin_src sh
+  ticc move supply/create_supply_schema schemas/supply
+  ticc move supply/create_part_table tables/supply/part
+  ticc move supply/create_supplier_table tables/supply/supplier
+  ticc move logistics/create_logistics_schema schemas/logistics
+  ticc move logistics/create_route_table tables/logistics/route
+#+end_src
 
 * Justifications
 

@@ -209,6 +209,20 @@ class Database {
         $this->database->exec($change->revert_script());}
 
 
+    public function verify_change(Change $change) {
+        /*
+         * Verify a change, to confirm it was already deployed. Note
+         * that this may be used when dependent Changes are also
+         * already deployed, so it cannot test reverting and
+         * redeploying.
+         */
+        $this->with_protection(
+            function() use ($change) {
+                $this->exec_to_rollback(
+                    $change->verify_script(), new exception\ChangeDeploymentError(
+                        "Change {$change->name()} failed to verify"));});}
+
+
     public function unmark_deployed(Change $change) {
         /*
          * Remove the deployment info for the given chnage
@@ -237,13 +251,15 @@ class Database {
 
         try {
             $this->database->exec("
-                insert into \"{$this->schema}\".deployed values (
-                       {$this->quote($change->name())}
+                insert into \"{$this->schema}\".deployed
+                select {$this->quote($change->name())}
                      , current_timestamp
                      , {$dependencies}
                      , {$this->quote($change->deploy_script())}
                      , {$this->quote($change->verify_script())}
-                     , {$this->quote($change->revert_script())});");}
+                     , {$this->quote($change->revert_script())}
+                where {$this->quote($change->name())} not in (
+                    select change from \"{$this->schema}\".deployed);");}
         catch (\PDOException $error) {
             throw new exception\FailureToMarkChange(
                 "Could not track change {$change->name()}",

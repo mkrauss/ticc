@@ -1,3 +1,12 @@
+* DONE Command to mark a change complete
+CLOSED: [2016-05-21 Sat 13:41]
+
+In case a subplan is for any reason done without ticc being aware.
+Command `ticc verify <change>` should run fund the minimum subplan to
+deploy <change>, and for each Change run the verify script to confirm
+it is legitimately deployed and mark it.
+
+* TODO Command to dump full plan to a file
 * TODO Add 'license' option for displaying more of GPL license
 
 * TODO Import/export option

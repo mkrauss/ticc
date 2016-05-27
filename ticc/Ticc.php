@@ -113,10 +113,10 @@ class Ticc {
             case 'deploy': $this->run_deploy(); break;
             case 'revert': $this->run_revert(); break;
             case 'sync': $this->run_sync(); break;
-            case 'redeploy': $this->run_redeploy(); break;
             case 'move': case 'mv': $this->run_move(); break;
+            case 'verify': $this->run_verify(); break;
             default: throw new exception\BadCommandException(
-                'Must give valid command: [deploy|revert|sync|redeploy]', 0x0c);}}
+                'Must give valid command: [deploy|revert|sync|move|verify]', 0x0c);}}
 
 
     private function run_deploy() {
@@ -135,10 +135,7 @@ class Ticc {
 
         $this->database->with_protection(function() {
             $this->deploy_plan(
-                (count($this->args) === 1
-                 ? $this->masterplan->subplan(array_shift($this->args))
-                 : $this->masterplan)
-                ->minus($this->deployedplan));});}
+                $this->plan_to_deploy()->minus($this->deployedplan));});}
 
 
     private function run_revert() {
@@ -149,10 +146,7 @@ class Ticc {
         // var_export($this->deployedplan->reverse()); die(PHP_EOL);
         $this->database->with_protection(function() {
             $this->revert_plan(
-                (count($this->args) === 1
-                 ? $this->deployedplan->superplan(array_shift($this->args))
-                 : $this->deployedplan)
-                ->reverse());});}
+                $this->plan_to_revert()->reverse());});}
 
 
     private function run_sync() {
@@ -171,11 +165,18 @@ class Ticc {
             echo PHP_EOL;
 
             $this->deploy_plan(
-                (count($this->args) === 1
-                 ? $this->masterplan->subplan(array_shift($this->args))
-                 : $this->masterplan)
-                ->minus($this->deployedplan
-                        ->minus($stale_plan)));});}
+                $this->plan_to_deploy()->minus($this->deployedplan
+                                               ->minus($stale_plan)));});}
+
+
+    public function run_verify() {
+        /*
+         * Find the minimum subplan to deploy <change> and, for each
+         * Change, run the verify script to confirm it is legitimately
+         * deployed and mark it so.
+         */
+        $this->database->with_protection(function() {
+            $this->verify_plan($this->plan_to_deploy());});}
 
 
     private function run_move() {
@@ -213,7 +214,7 @@ class Ticc {
 
     private function deploy_plan($plan) {
         /*
-         * Revert all changes in $plan
+         * Deploy all changes in $plan
          */
         $plan->inject_changes_to(
             function (Change $change) {
@@ -239,6 +240,45 @@ class Ticc {
                     $this->database->revert_change($change);
                     echo " Done.\n";}
                 $this->database->unmark_deployed($change);});}
+
+
+    private function verify_plan($plan) {
+        /*
+         * Verify all changes in $plan
+         */
+        $plan->inject_changes_to(
+            function (Change $change) {
+                echo "Verifying: {$change->name()}... ";
+                if (is_null($change->verify_script()))
+                    echo "Nothing to verify.\n";
+                else {
+                    $this->database->verify_change($change);
+                    echo " Good.\n";}
+                $this->database->mark_deployed($change);});}
+
+
+    private function plan_to_deploy() {
+        /*
+         * Takes the next argument as a Change name and returns a
+         * minimum subset of the master plan to deploy that Change; if
+         * there is no next argument, returns the complete master
+         * plan.
+         */
+        return (count($this->args) >= 1
+                ? $this->masterplan->subplan(array_shift($this->args))
+                : $this->masterplan);}
+
+
+    private function plan_to_revert() {
+        /*
+         * Takes the next argument as a Change name and returns a
+         * minimum subset of the deployed plan to revert that Change;
+         * if there is no next argument, returns the complete deployed
+         * plan.
+         */
+        return (count($this->args) >= 1
+                ? $this->deployedplan->superplan(array_shift($this->args))
+                : $this->deployedplan);}
 
 
     private function load_plans() {
