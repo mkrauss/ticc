@@ -39,7 +39,9 @@ class Ticc {
 
         $this->find_change_dir();
 
-        $this->load_plans();}
+        $this->load_plans();
+
+        $this->build_plan_runner();}
 
 
     private function load_parameters($argv) {
@@ -95,6 +97,14 @@ class Ticc {
             F\pick($this->config, 'plan_directory', ''));}
 
 
+    public function build_plan_runner() {
+        /*
+         * Instantiate our PlanRunner object
+         */
+        $this->plan_runner = new PlanRunner($this->database);
+    }
+
+
     public function run() {
         /*
          * Main entry point - switches control based on command
@@ -118,7 +128,7 @@ class Ticc {
          * dependencies of it, or all un-deployed changes.
          */
         $this->database->with_protection(function() {
-            $this->deploy_plan(
+            $this->plan_runner->deploy_plan(
                 $this->plan_to_deploy()->minus($this->deployedplan));});}
 
 
@@ -129,7 +139,7 @@ class Ticc {
          */
         // var_export($this->deployedplan->reverse()); die(PHP_EOL);
         $this->database->with_protection(function() {
-            $this->revert_plan(
+            $this->plan_runner->revert_plan(
                 $this->plan_to_revert()->reverse());});}
 
 
@@ -144,11 +154,11 @@ class Ticc {
             $stale_plan = $this->deployedplan
                 ->different_from($this->masterplan);
 
-            $this->revert_plan($stale_plan->reverse());
+            $this->plan_runner->revert_plan($stale_plan->reverse());
 
             echo PHP_EOL;
 
-            $this->deploy_plan(
+            $this->plan_runner->deploy_plan(
                 $this->plan_to_deploy()->minus($this->deployedplan
                                                ->minus($stale_plan)));});}
 
@@ -160,7 +170,7 @@ class Ticc {
          * deployed and mark it so.
          */
         $this->database->with_protection(function() {
-            $this->verify_plan($this->plan_to_deploy());});}
+            $this->plan_runner->verify_plan($this->plan_to_deploy());});}
 
 
     private function run_move() {
@@ -194,51 +204,6 @@ class Ticc {
 
         $this->database->rename_change($old, $new);
     }
-
-
-    private function deploy_plan($plan) {
-        /*
-         * Deploy all changes in $plan
-         */
-        $plan->inject_changes_to(
-            function (Change $change) {
-                echo "Deploying: {$change->name()}... ";
-                if (is_null($change->deploy_script()))
-                    echo "Nothing to deploy.\n";
-                else {
-                    $this->database->deploy_change($change);
-                    echo " Done.\n";}
-                $this->database->mark_deployed($change);});}
-
-
-    private function revert_plan($plan) {
-        /*
-         * Revert all changes in $plan
-         */
-        $plan->inject_changes_to(
-            function (Change $change) {
-                echo "Reverting: {$change->name()}...";
-                if (is_null($change->revert_script()))
-                    echo "Nothing to revert.\n";
-                else {
-                    $this->database->revert_change($change);
-                    echo " Done.\n";}
-                $this->database->unmark_deployed($change);});}
-
-
-    private function verify_plan($plan) {
-        /*
-         * Verify all changes in $plan
-         */
-        $plan->inject_changes_to(
-            function (Change $change) {
-                echo "Verifying: {$change->name()}... ";
-                if (is_null($change->verify_script()))
-                    echo "Nothing to verify.\n";
-                else {
-                    $this->database->verify_change($change);
-                    echo " Good.\n";}
-                $this->database->mark_deployed($change);});}
 
 
     private function plan_to_deploy() {
@@ -281,6 +246,7 @@ class Ticc {
     private $args;
     private $config;
     private $database;
+    private $plan_runner;
     private $masterplan;
     private $deployedplan;
     private $change_directory;
