@@ -20,7 +20,7 @@
     "require": {
         "php": ">=7.0",
         "lstrojny/functional-php": "~1.2",
-        "alexkazik/getopts": "1.0.0"
+        "alexkazik/getopts": "dev-master#49a00bf8c8563fadf1024b01495d62bc1c9acad9"
     },
 
     "repositories": {
@@ -28,7 +28,7 @@
             "type": "package",
             "package": {
                 "name": "alexkazik/getopts",
-                "version": "1.0.0",
+                "version": "dev-master",
                 "source": {
                     "url": "https://github.com/alexkazik/getopts",
                     "type": "git",
