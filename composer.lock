@@ -4,18 +4,19 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "a7e4ed4fcee1319a505059faad5f520d",
-    "content-hash": "4aa41968c303c8f214b30552208b9e68",
+    "hash": "95dcd8d0520ff6dff6e295333ad45422",
+    "content-hash": "83904af5d8f1f61338934411c6ebb5a8",
     "packages": [
         {
             "name": "alexkazik/getopts",
-            "version": "1.0.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/alexkazik/getopts",
-                "reference": "master"
+                "reference": "49a00bf8c8563fadf1024b01495d62bc1c9acad9"
             },
-            "type": "library"
+            "type": "library",
+            "time": "2011-05-13 10:38:20"
         },
         {
             "name": "lstrojny/functional-php",
@@ -73,7 +74,9 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "alexkazik/getopts": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
