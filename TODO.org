@@ -73,3 +73,16 @@ formatting. Consider hjson...
 https://hjson.org/
 
 Another option: give up json and use more strictly defined format(s).
+
+Having played with HJSON there are some problems, principally:
+- It changes the way we access config/plan values from arrays to
+  objects.
+- The HJSON library for PHP depends on having the mbstring module which is
+  not installed by default on Debian/Ubuntu. (A good argument for
+  rewriting in another language, but there are time pressures against
+  that now.)
+
+Consider refactoring current config/plan access to put it behind a
+class that normalizes the way we load, access, modify and save
+config/plan data, then adding optional support for HJSON as well as
+other formats - some people actually like YML.
