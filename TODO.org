@@ -1,3 +1,6 @@
+
+Fully prioritized TODO list
+
 * DONE Command to mark a change complete
 CLOSED: [2016-05-21 Sat 13:41]
 
@@ -6,17 +9,23 @@ Command `ticc verify <change>` should run fund the minimum subplan to
 deploy <change>, and for each Change run the verify script to confirm
 it is legitimately deployed and mark it.
 
-* TODO Command to dump full plan to a file
-* TODO Add 'license' option for displaying more of GPL license
-
-* TODO Import/export option
-
-** TODO Import from Sqitch
-
-** TODO Export to Sqitch
-
 * DONE Command to move a change
 CLOSED: [2016-05-04 Wed 00:12]
+
+* TODO Multiple database targets in config
+
+* TODO Multiple environments
+
+- Config file specifies default and other environments
+- Command line can choose environment
+- Changes that are environment-specific
+  - Should only be loaded to the plan when using that environment
+  - Changes from outside an environment cannot depend on Changes from
+    inside it.
+
+* TODO Command to export effective plan to a file
+
+For DBA review before production deploy, for example
 
 * TODO Sync dependencies
 
@@ -64,6 +73,25 @@ bad dependency.
 Another option here is to validate all dependencies before sorting, so
 there is only one possible error when sorting.
 
+* TODO Local config
+
+Values that override the main config so that users can keep local
+changes that do not get committed to a shared repo
+
+* TODO Import/export option
+
+** TODO Import from Sqitch
+
+** TODO Export to Sqitch
+
+* TODO Show plans
+
+- dry-run, show the plan that would be followed for another command
+- show the master plan
+- show the currently deployed plan
+
+* TODO Add 'license' option for displaying more of GPL license
+
 * TODO Figure out a way to preserve json source
 
 Would be nice to be able to modify a plan and write back the plan.json
@@ -86,3 +114,10 @@ Consider refactoring current config/plan access to put it behind a
 class that normalizes the way we load, access, modify and save
 config/plan data, then adding optional support for HJSON as well as
 other formats - some people actually like YML.
+
+* TODO Allow Changes to specify DB role to be run as
+
+Questionable value. Deployment should probably normally be run as a
+superuser but maybe verify scripts could run as a limited role? Of
+course SET ROLE is probably sufficient and has the benefit of being
+explicit.
