@@ -48,13 +48,20 @@ class Ticc {
         /*
          * Parse options
          */
+        list($errors, $this->params, $this->args) = getopts(
+            [
+              'BAD config file' => ['Vs', 'c', 'conf'],
+              'verbose' => ['Ss', 'v', 'verbose']
+            ],
+            $argv);
+
+        // If flag options come in before the command, it will think they are
+        // the command, therefore they need to be cleaned out.
+        $argv = F\select($argv, function ($arg) {
+          return strpos($arg, '-') === false;});
 
         $this->called_as = array_shift($argv);
         $this->command = array_shift($argv);
-
-        list($errors, $this->params, $this->args) = getopts(
-            ['BAD config file' => ['Vs', 'c', 'conf']],
-            $argv);
 
         if ($errors) {
             // Handle errors?
@@ -127,6 +134,15 @@ class Ticc {
          * Deploy a set of changes - a target change and all
          * dependencies of it, or all un-deployed changes.
          */
+        if($this->masterplan->minus($this->deployedplan)->plan_empty_p()) {
+            // @todo Not sure if this should be an exception, but it should be
+            // clearer when user is running in a non-working directory (such
+            // as the project top level with no direct sub-directories that
+            // have the appropriate plan.json files)
+            throw new exception\EmptyPlanException(
+                'No plan items to deploy (are you in a directory that has directories with a plan.json file in them?)'
+            );}
+
         $this->database->with_protection(function() {
             $this->plan_runner->deploy_plan(
                 $this->plan_to_deploy()->minus($this->deployedplan));});}
@@ -237,6 +253,13 @@ class Ticc {
 
         $this->masterplan = new Plan($this->change_directory->changes());
         $this->deployedplan = new Plan($this->database->deployed_changes());}
+
+
+    public function get_parameter(string $key) {
+        /*
+        * Get a setting from the params array, or null if not set
+        */
+        return F\pick($this->params, $key, null);}
 
 
     private $called_as;

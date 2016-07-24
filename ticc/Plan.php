@@ -20,6 +20,7 @@
  *
  * Report issues at: https://github.com/mkrauss/ticc
  */
+declare(strict_types=1);
 
 namespace ticc;
 
@@ -202,6 +203,12 @@ class Plan {
          */
         foreach ($this->plan as $change) $fn($change);}
 
+
+    public function plan_empty_p(): bool {
+        /*
+         * Check if the plan is empty or not
+         */
+        return empty($this->plan);}
 
     private $plan;
 }
