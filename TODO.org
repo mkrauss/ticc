@@ -12,6 +12,10 @@ it is legitimately deployed and mark it.
 * DONE Command to move a change
 CLOSED: [2016-05-04 Wed 00:12]
 
+* TODO Command to export effective plan to a file
+
+For DBA review before production deploy, for example
+
 * TODO Multiple database targets in config
 
 * TODO Multiple environments
@@ -22,10 +26,6 @@ CLOSED: [2016-05-04 Wed 00:12]
   - Should only be loaded to the plan when using that environment
   - Changes from outside an environment cannot depend on Changes from
     inside it.
-
-* TODO Command to export effective plan to a file
-
-For DBA review before production deploy, for example
 
 * TODO Sync dependencies
 
