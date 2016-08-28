@@ -84,7 +84,7 @@ class Ticc {
          */
 
         if (empty($this->config['database']))
-            throw new exception\NoDatabaseException();
+            throw new exception\NoDatabase();
 
         $this->database = new Database($this->config['database']);}
 
@@ -118,7 +118,7 @@ class Ticc {
             case 'sync': $this->run_sync(); break;
             case 'move': case 'mv': $this->run_move(); break;
             case 'verify': $this->run_verify(); break;
-            default: throw new exception\BadCommandException(
+            default: throw new exception\BadCommand(
                 'Must give valid command: [deploy|revert|sync|move|verify]', 0x0c);}}
 
 
@@ -179,19 +179,19 @@ class Ticc {
          * deployed plan
          */
         if (count($this->args) < 2) {
-            throw new exception\BadCommandException(
+            throw new exception\BadCommand(
                 'Please provide an origin change to move, and a destination.');}
 
         $old = array_shift($this->args);
 
         if ($old === "/") {
-            throw new exception\BadCommandException(
+            throw new exception\BadCommand(
                 "Cannot move top level change");}
 
         $new = array_shift($this->args);
 
         if ($new === $old) {
-            throw new exception\BadCommandException(
+            throw new exception\BadCommand(
                 "Cannot move a change to itself");}
 
         $this->change_directory->remove_change_named($old);

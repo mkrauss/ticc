@@ -23,4 +23,4 @@
 
 namespace ticc\exception;
 
-class BadCommandException extends \Exception{};
+class NoDatabase extends \Exception{};

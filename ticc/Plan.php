@@ -190,7 +190,7 @@ class Plan {
                 return $change_name === $change->name(); });
 
         if (is_null($change))
-            throw new exception\BadChangeException(
+            throw new exception\BadChange(
                 "Cannot find change named {$change_name}");
 
         return $change;}

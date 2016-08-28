@@ -129,7 +129,7 @@ class ChangeSource {
          * Remove the change named $change_name from the source
          */
         if (!is_dir($change_name)) {
-            throw new exception\BadChangeException(
+            throw new exception\BadChange(
                 "Change {$change_name} does not exist");}
 
         $this->remove_change_file($change_name, 'deploy.sql');

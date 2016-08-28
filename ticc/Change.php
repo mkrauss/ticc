@@ -32,7 +32,7 @@ class Change {
          */
 
         if (!isset($change_plan['change_name']))
-            throw new exception\BadChangeException('Change missing name');
+            throw new exception\BadChange('Change missing name');
 
         $this->name = $change_plan['change_name'];
         $this->dependencies = F\pick($change_plan, 'dependencies', []);
@@ -49,7 +49,7 @@ class Change {
         elseif (isset($change_plan['deploy_script'])
                 || isset($change_plan['revert_script'])
                 || isset($change_plan['verify_script'])) {
-            throw new exception\BadChangeException("Incomplete change {$this->name}");}}
+            throw new exception\BadChange("Incomplete change {$this->name}");}}
 
 
     public function depends_on($change_name) {

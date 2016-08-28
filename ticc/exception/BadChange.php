@@ -23,4 +23,4 @@
 
 namespace ticc\exception;
 
-class NoDatabaseException extends \Exception{};
+class BadChange extends \Exception{};

@@ -23,4 +23,4 @@
 
 namespace ticc\exception;
 
-class BadChangeException extends \Exception{};
+class BadCommand extends \Exception{};
