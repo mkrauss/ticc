@@ -40,7 +40,9 @@ class Database {
             (isset($config['engine']) ? "{$config['engine']}:" : 'pgsql:')
             . (isset($config['host']) ? "host={$config['host']};" : '')
             . (isset($config['port']) ? "port={$config['port']};" : '')
-            . (isset($config['name']) ? "dbname={$config['name']}" : ''));
+            . (isset($config['name']) ? "dbname={$config['name']};" : ''),
+            (isset($config['username']) ? $config['username'] : null),
+            (isset($config['password']) ? $config['password'] : null));
 
         $this->database->setAttribute(\PDO::ATTR_ERRMODE,
                                       \PDO::ERRMODE_EXCEPTION);
