@@ -20,7 +20,8 @@
     "require": {
         "php": ">=7.0",
         "lstrojny/functional-php": "~1.2",
-        "alexkazik/getopts": "dev-master#49a00bf8c8563fadf1024b01495d62bc1c9acad9"
+        "alexkazik/getopts": "dev-master#49a00bf8c8563fadf1024b01495d62bc1c9acad9",
+        "corneltek/getoptionkit": "^2.5"
     },
 
     "repositories": {

@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "95dcd8d0520ff6dff6e295333ad45422",
-    "content-hash": "83904af5d8f1f61338934411c6ebb5a8",
+    "hash": "1bf9877d631d903d258156e4dd1c1fcf",
+    "content-hash": "813b4ecc8b3d9288adde46b1e7ba5930",
     "packages": [
         {
             "name": "alexkazik/getopts",
@@ -17,6 +17,52 @@
             },
             "type": "library",
             "time": "2011-05-13 10:38:20"
+        },
+        {
+            "name": "corneltek/getoptionkit",
+            "version": "2.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/c9s/GetOptionKit.git",
+                "reference": "076cc41051d6417bf9304fe92f8d9793edac9910"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/c9s/GetOptionKit/zipball/076cc41051d6417bf9304fe92f8d9793edac9910",
+                "reference": "076cc41051d6417bf9304fe92f8d9793edac9910",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "corneltek/phpunit-testmore": "dev-master",
+                "satooshi/php-coveralls": "^1"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.5.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "GetOptionKit\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Yo-An Lin",
+                    "email": "cornelius.howl@gmail.com"
+                }
+            ],
+            "description": "Powerful command-line option toolkit",
+            "homepage": "http://github.com/c9s/GetOptionKit",
+            "time": "2016-07-18 07:44:29"
         },
         {
             "name": "lstrojny/functional-php",
