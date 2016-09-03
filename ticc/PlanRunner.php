@@ -23,57 +23,8 @@
 
 namespace ticc;
 
-use Functional as F;
-
-class PlanRunner {
-    public function __construct(Database $database) {
-        $this->database = $database;}
-
-
-    public function deploy_plan(Plan $plan) {
-        /*
-         * Deploy all changes in $plan
-         */
-        $plan->inject_changes_to(
-            function (Change $change) {
-                echo "Deploying: {$change->name()}... ";
-                if (is_null($change->deploy_script()))
-                    echo "Nothing to deploy.\n";
-                else {
-                    $this->database->deploy_change($change);
-                    echo " Done.\n";}
-                $this->database->mark_deployed($change);});}
-
-
-    public function revert_plan(Plan $plan) {
-        /*
-         * Revert all changes in $plan
-         */
-        $plan->inject_changes_to(
-            function (Change $change) {
-                echo "Reverting: {$change->name()}...";
-                if (is_null($change->revert_script()))
-                    echo "Nothing to revert.\n";
-                else {
-                    $this->database->revert_change($change);
-                    echo " Done.\n";}
-                $this->database->unmark_deployed($change);});}
-
-
-    public function verify_plan(Plan $plan) {
-        /*
-         * Verify all changes in $plan
-         */
-        $plan->inject_changes_to(
-            function (Change $change) {
-                echo "Verifying: {$change->name()}... ";
-                if (is_null($change->verify_script()))
-                    echo "Nothing to verify.\n";
-                else {
-                    $this->database->verify_change($change);
-                    echo " Good.\n";}
-                $this->database->mark_deployed($change);});}
-
-
-    public $database;
+interface PlanRunner {
+    public function deploy_plan(Plan $plan);
+    public function revert_plan(Plan $plan);
+    public function verify_plan(Plan $plan);
 }

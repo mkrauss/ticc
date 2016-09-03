@@ -118,7 +118,7 @@ class Ticc {
         /*
          * Instantiate our PlanRunner object
          */
-        return new PlanRunner($db);
+        return new PlanRunner\RealPlanRunner($db);
     }
 
     public function run() {
