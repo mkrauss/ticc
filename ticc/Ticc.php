@@ -44,29 +44,40 @@ class Ticc {
         $this->build_plan_runner();}
 
 
+    private function build_option_specs() {
+        /*
+         * Return the command option specs
+         */
+        $specs = new \GetOptionKit\OptionCollection;
+
+        $specs->add('c|config:', 'use different configuration file')
+            ->isa('file')
+            ->defaultValue('ticc.json');
+
+        return $specs;
+    }
+
+
     private function load_parameters($argv) {
         /*
          * Parse options
          */
+        $this->params = (new \GetOptionKit\OptionParser($this->build_option_specs()))
+            ->parse($argv);
 
-        $this->called_as = array_shift($argv);
-        $this->command = array_shift($argv);
+        $this->args = $this->params->getArguments();
 
-        list($errors, $this->params, $this->args) = getopts(
-            ['BAD config file' => ['Vs', 'c', 'conf']],
-            $argv);
+        if (count($this->args) < 1) {
+            throw new exception\BadCommand('Must give exactly one command');}
 
-        if ($errors) {
-            // Handle errors?
-            var_dump($errors); echo PHP_EOL;
-            exit;}}
+        $this->command = array_shift($this->args);}
 
 
     private function load_config() {
         /*
          * Load the configuration file
          */
-        if (!file_exists(F\pick($this->params, 'config file', 'ticc.json'))) {
+        if (!file_exists($this->params->{'config'})) {
             throw new \Exception(
                 'Please copy ticc.sample.json to ticc.json and customize as directed in the README.',
                 0x0f
@@ -75,7 +86,7 @@ class Ticc {
 
         $this->config = json_decode(
             file_get_contents(
-                F\pick($this->params, 'config file', 'ticc.json')), true);}
+                $this->params->{'config'}), true);}
 
 
     private function connect_db() {
