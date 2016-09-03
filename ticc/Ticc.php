@@ -31,17 +31,22 @@ class Ticc {
          * Initialize application
          */
 
-        $this->load_parameters($argv);
+        list($this->command,
+             $this->args,
+             $this->params) = $this->load_parameters($argv);
 
-        $this->load_config();
+        $this->config = $this->load_config($this->params->{'config'});
 
-        $this->connect_db();
+        $this->database = $this->connect_db(
+            F\pick($this->config, 'database', []));
 
-        $this->find_change_dir();
+        $this->change_directory = $this->find_change_dir(
+            F\pick($this->config, 'plan_directory', ''));
 
-        $this->load_plans();
+        $this->deployedplan = $this->load_deployedplan($this->database);
+        $this->masterplan = $this->load_masterplan($this->change_directory);
 
-        $this->build_plan_runner();}
+        $this->plan_runner = $this->build_plan_runner($this->database);}
 
 
     private function build_option_specs() {
@@ -58,63 +63,63 @@ class Ticc {
     }
 
 
-    private function load_parameters($argv) {
+    private function load_parameters($argv) : array {
         /*
          * Parse options
          */
-        $this->params = (new \GetOptionKit\OptionParser($this->build_option_specs()))
+        $params = (new \GetOptionKit\OptionParser($this->build_option_specs()))
             ->parse($argv);
 
-        $this->args = $this->params->getArguments();
+        $args = $params->getArguments();
 
-        if (count($this->args) < 1) {
+        if (count($args) < 1) {
             throw new exception\BadCommand('Must give exactly one command');}
 
-        $this->command = array_shift($this->args);}
+        $command = array_shift($args);
+
+        return [$command, $args, $params];}
 
 
-    private function load_config() {
+    private function load_config($filepath) : array {
         /*
          * Load the configuration file
          */
-        if (!file_exists($this->params->{'config'})) {
+        if (!file_exists($filepath)) {
             throw new \Exception(
                 'Please copy ticc.sample.json to ticc.json and customize as directed in the README.',
                 0x0f
             );
         }
 
-        $this->config = json_decode(
+        return json_decode(
             file_get_contents(
-                $this->params->{'config'}), true);}
+                $filepath), true);}
 
 
-    private function connect_db() {
+    private function connect_db(array $config) : Database {
         /*
          * Connect to the database
          */
 
-        if (empty($this->config['database']))
+        if (empty($config))
             throw new exception\NoDatabase();
 
-        $this->database = new Database($this->config['database']);}
+        return new Database($config);}
 
 
-    private function find_change_dir() {
+    private function find_change_dir(string $directory) : ChangeSource {
         /*
          * Configure the master plan change directory
          */
-        $this->change_directory = new ChangeSource(
-            F\pick($this->config, 'plan_directory', ''));}
+        return new ChangeSource($directory);}
 
 
-    public function build_plan_runner() {
+    public function build_plan_runner(Database $db) : PlanRunner {
         /*
          * Instantiate our PlanRunner object
          */
-        $this->plan_runner = new PlanRunner($this->database);
+        return new PlanRunner($db);
     }
-
 
     public function run() {
         /*
@@ -241,13 +246,19 @@ class Ticc {
                 : $this->deployedplan);}
 
 
-    private function load_plans() {
+    private function load_deployedplan(Database $db) : Plan {
+        /*
+         * Loads a plan of already-deployed changes from the db
+         */
+
+        return new Plan($db->deployed_changes());}
+
+    private function load_masterplan(ChangeSource $source) : Plan {
         /*
          * Loads a plan of changes from the given $plan_dir
          */
 
-        $this->masterplan = new Plan($this->change_directory->changes());
-        $this->deployedplan = new Plan($this->database->deployed_changes());}
+        return new Plan($source->changes());}
 
 
     private $called_as;
