@@ -46,7 +46,7 @@ class Ticc {
         $this->deployedplan = $this->load_deployedplan($this->database);
         $this->masterplan = $this->load_masterplan($this->change_directory);
 
-        $this->plan_runner = $this->build_plan_runner($this->database);}
+        $this->plan_runner = $this->build_plan_runner($this->params, $this->database);}
 
 
     private function build_option_specs() {
@@ -58,6 +58,14 @@ class Ticc {
         $specs->add('c|config:', 'use different configuration file')
             ->isa('file')
             ->defaultValue('ticc.json');
+
+        $specs->add('n|dry-run', 'show what would be done without doing it')
+            ->isa('boolean')
+            ->defaultValue(false);
+
+        $specs->add('q|export-sql', 'export SQL queries')
+            ->isa('boolean')
+            ->defaultValue(false);
 
         return $specs;
     }
@@ -114,10 +122,23 @@ class Ticc {
         return new ChangeSource($directory);}
 
 
-    public function build_plan_runner(Database $db) : PlanRunner {
+    public function build_plan_runner(
+        \GetOptionKit\OptionResult $params,
+        Database $db)
+        : PlanRunner {
         /*
          * Instantiate our PlanRunner object
          */
+        if ($params->{'dry-run'} && $params->{'export-sql'}) {
+            throw exception\BadCommand("Cannot do dry-run and export-sql together");}
+
+        if ($params->{'dry-run'}) {
+            return new PlanRunner\DryPlanRunner();}
+
+        if ($params->{'export-sql'}) {
+            return new PlanRunner\ExportSqlPlanRunner(
+                new \SPLFileObject($params->{'export-sql'}, 'w'));}
+
         return new PlanRunner\RealPlanRunner($db);
     }
 

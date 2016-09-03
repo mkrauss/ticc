@@ -12,7 +12,8 @@ it is legitimately deployed and mark it.
 * DONE Command to move a change
 CLOSED: [2016-05-04 Wed 00:12]
 
-* TODO Command to export effective plan to a file
+* DONE Command to export effective plan to a file
+CLOSED: [2016-09-02 Fri 23:56]
 
 For DBA review before production deploy, for example
 
@@ -86,9 +87,9 @@ changes that do not get committed to a shared repo
 
 * TODO Show plans
 
-- dry-run, show the plan that would be followed for another command
-- show the master plan
-- show the currently deployed plan
+- [X] dry-run, show the plan that would be followed for another command
+- [ ] show the master plan
+- [ ] show the currently deployed plan
 
 * TODO Add 'license' option for displaying more of GPL license
 
